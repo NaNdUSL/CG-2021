@@ -77,11 +77,6 @@ int circleDr(float radius, int slices, int stacks){
 
 
 
-
-
-
-
-
 ////////////////////////////////////////////////////////////// CONE //////////////////////////////////////////////////////////////////////////
 
 int coneVertex(float radius, float height, int slices, int stacks, int totalVtx, float vtx[totalVtx][3], int totalFaces, int vtxNb[]){
@@ -131,6 +126,57 @@ int coneDr(float radius,float height, int slices, int stacks){
 
 
 
+////////////////////////////////////////////////////////////// PLANO //////////////////////////////////////////////////////////////////////////
+
+int planeVertex(float xDim, float zDim, int xSlc, int zSlc, int totalVtx, float vtx[totalVtx][3], int totalFaces, int vtxNb[]){
+	int vtxPts = 1;
+	int aux[xSlc+1][zSlc+2];
+	float xRatio = xDim/xSlc;
+	float zRatio = zDim/zSlc;
+	int x,z;
+	for (x = 0;  x < xSlc+1; x++){
+		for (z = 0; z < zSlc+1; z++){
+			vtx[vtxPts-1][0] = (-(xDim)/2) + x*xRatio;
+			vtx[vtxPts-1][1] = 0;                   
+			vtx[vtxPts-1][2] = (-(zDim)/2) + z*zRatio;
+
+			aux[x][z] = vtxPts++; 
+		}
+		aux[x][z] = -1;
+	}
+
+	return trisPolyLine(xSlc+1,zSlc+2,aux,vtxNb);
+}
+
+
+
+int planeDr(float xDim, float zDim, int xSlc, int zSlc){
+	int totalVtx = (xSlc+1)*(zSlc+1);
+	int totalFaces = (2*totalVtx - 4);
+	int vtxNb[totalFaces*3];
+	float vtx[totalVtx][3];
+	int h = planeVertex(xDim,zDim,xSlc,zSlc,totalVtx,vtx,totalFaces,vtxNb);
+	for (int i = 0; i < totalVtx; i++){
+		printf("%d: %f , %f , %f\n",i+1,vtx[i][0],vtx[i][1],vtx[i][2] ); 	
+	}
+
+	for (int i = 0; i < h; i+=3){
+		printf("%d %d %d \n", vtxNb[i],vtxNb[i+1],vtxNb[i+2]);
+	}
+	return 0;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int boxVertex(float xDim, float yDim, float zDim,int slicesX, int slicesY, int slicesZ,int totalVtx, float vtx[totalVtx][3], int totalFaces, int vtxNb[]){
 	int vtxPts = 1;
@@ -172,13 +218,6 @@ int boxDr(float xDim, float yDim, float zDim,int slicesX, int slicesY, int slice
 
 
 
-
-
-
-
-
-
-
 int main(int argc, char const *argv[]){
 	//int vtx[4][3] = {{-1,1,-1},{1,3,4},{5,6,7},{8,8,8}};
 	//int res[L*3];
@@ -191,6 +230,7 @@ int main(int argc, char const *argv[]){
 	//}
 	//boxDr(10,10,10,2,4,2);
 	//circleDr(30,4,2);
-	coneDr(30,20,4,10);
+	//coneDr(30,20,4,10);
+	planeDr(20,15,2,2);
 	return 0;
 }
