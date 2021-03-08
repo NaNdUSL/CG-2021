@@ -2,9 +2,16 @@
 #include <stdlib.h>
 #define L 20
 #include <math.h>
+#include <iostream>
+#include <fstream>
+#include <vector>
+using namespace std;
+ofstream MyFile("filename.txt");
 
 
-int trisPolyLine(int N, int K,int vtx[N][K], int res[]){
+
+
+int trisPolyLine(int N, int K, vector<vector<int>> vtx, int res[]){
 	int t = 0;
 	for (int i = 1; i < N; i++){
 		for (int h = 0; h < K; h++){
@@ -27,16 +34,11 @@ int trisPolyLine(int N, int K,int vtx[N][K], int res[]){
 
 
 
-
-
-
-
-
 /////////////////////////////////////////////////////////////////////// ESFERA /////////////////////////////////////////////////////////////////
 
-int circleVertex(float radius, int slices, int stacks, int totalVtx, float vtx[totalVtx][3], int totalFaces, int vtxNb[]){
+int circleVertex(float radius, int slices, int stacks, vector<vector <float>> vtx, vector<int> vtxNb){
 	int vtxPts = 1; // NUNCA PASSE ISSO PARA 0
-	int aux[stacks+2][slices];
+	vector<vector<int>> aux;
 	float rat = (2*radius)/(stacks+1);
 	float freqalf = (2*M_PI)/slices;
 	float freqbet = (M_PI)/(stacks+1);
@@ -61,7 +63,7 @@ int circleDr(float radius, int slices, int stacks){
 	int totalFaces = (2*totalVtx - 4);
 	int vtxNb[totalFaces*3];
 	float vtx[totalVtx][3];
-	int h = circleVertex(radius,slices,stacks,totalVtx,vtx,totalFaces,vtxNb);
+	int h = circleVertex(radius,slices,stacks,vtx,vtxNb);
 	for (int i = 0; i < totalVtx; i++){
 		printf("%d: %f , %f , %f\n",i+1,vtx[i][0],vtx[i][1],vtx[i][2] ); 	
 	}
@@ -79,7 +81,7 @@ int circleDr(float radius, int slices, int stacks){
 
 ////////////////////////////////////////////////////////////// CONE //////////////////////////////////////////////////////////////////////////
 
-int coneVertex(float radius, float height, int slices, int stacks, int totalVtx, float vtx[totalVtx][3], int totalFaces, int vtxNb[]){
+int coneVertex(float radius, float height, int slices, int stacks, float vtx[][3], int vtxNb[]){
 	int vtxPts = 1; // NUNCA PASSE ISSO PARA 0
 	int aux[stacks+2][slices];
 	float rat = (radius)/stacks;
@@ -109,7 +111,7 @@ int coneDr(float radius,float height, int slices, int stacks){
 	int totalFaces = (2*totalVtx - 4);
 	int vtxNb[totalFaces*3];
 	float vtx[totalVtx][3];
-	int h = coneVertex(radius, height, slices,stacks,totalVtx,vtx,totalFaces,vtxNb);
+	int h = coneVertex(radius, height, slices,stacks,vtx,vtxNb);
 	for (int i = 0; i < totalVtx; i++){
 		printf("%d: %f , %f , %f\n",i+1,vtx[i][0],vtx[i][1],vtx[i][2] ); 	
 	}
@@ -122,29 +124,44 @@ int coneDr(float radius,float height, int slices, int stacks){
 
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
 ////////////////////////////////////////////////////////////// PLANO //////////////////////////////////////////////////////////////////////////
 
-int planeVertex(float xDim, float zDim, int xSlc, int zSlc, int totalVtx, float vtx[totalVtx][3], int totalFaces, int vtxNb[]){
-	int vtxPts = 1;
+int planeVertex(float Orig[3], float xAng, float zAng, float xDim, float zDim, int xSlc, int zSlc, int*vtxPts, float vtx[][3], int vtxNb[]){
 	int aux[xSlc+1][zSlc+2];
 	float xRatio = xDim/xSlc;
 	float zRatio = zDim/zSlc;
+	float rots[3];
 	int x,z;
 	for (x = 0;  x < xSlc+1; x++){
 		for (z = 0; z < zSlc+1; z++){
-			vtx[vtxPts-1][0] = (-(xDim)/2) + x*xRatio;
-			vtx[vtxPts-1][1] = 0;                   
-			vtx[vtxPts-1][2] = (-(zDim)/2) + z*zRatio;
+			//gera o ponto
+			vtx[*vtxPts-1][0] = (-(xDim)/2) + x*xRatio;
+			vtx[*vtxPts-1][1] = 0;                   
+			vtx[*vtxPts-1][2] = (-(zDim)/2) + z*zRatio;
 
-			aux[x][z] = vtxPts++; 
+			//rotate xAx
+			rots[0] = vtx[*vtxPts-1][0];
+			rots[1] = - vtx[*vtxPts-1][2]*sin(xAng);
+			rots[2] = vtx[*vtxPts-1][2]*cos(xAng);
+			//rotate zAx
+			vtx[*vtxPts-1][0] = rots[0]*cos(zAng) - rots[1]*sin(zAng);
+			vtx[*vtxPts-1][1] = rots[0]*sin(zAng) + rots[1]*cos(zAng);
+			vtx[*vtxPts-1][2] = rots[2];
+
+
+			//translada para centrar na origem desejada
+			vtx[*vtxPts-1][0] += Orig[0];
+			vtx[*vtxPts-1][1] += Orig[1];
+			vtx[*vtxPts-1][2] += Orig[2];
+			
+			aux[x][z] = (*vtxPts)++; 
 		}
 		aux[x][z] = -1;
 	}
-
 	return trisPolyLine(xSlc+1,zSlc+2,aux,vtxNb);
 }
 
@@ -155,7 +172,9 @@ int planeDr(float xDim, float zDim, int xSlc, int zSlc){
 	int totalFaces = (2*totalVtx - 4);
 	int vtxNb[totalFaces*3];
 	float vtx[totalVtx][3];
-	int h = planeVertex(xDim,zDim,xSlc,zSlc,totalVtx,vtx,totalFaces,vtxNb);
+	float orig[3] = {0,0,0};
+	int vtxPts = 1;
+	int h = planeVertex(orig, 0, 0,xDim,zDim,xSlc,zSlc,&vtxPts,vtx,vtxNb);
 	for (int i = 0; i < totalVtx; i++){
 		printf("%d: %f , %f , %f\n",i+1,vtx[i][0],vtx[i][1],vtx[i][2] ); 	
 	}
@@ -176,9 +195,114 @@ int planeDr(float xDim, float zDim, int xSlc, int zSlc){
 
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////// BOX //////////////////////////////////////////////////////////////////////////////
 
-int boxVertex(float xDim, float yDim, float zDim,int slicesX, int slicesY, int slicesZ,int totalVtx, float vtx[totalVtx][3], int totalFaces, int vtxNb[]){
+
+int boxDr(float xDim, float yDim, float zDim,int slicesX, int slicesY, int slicesZ){
+	int vtxPts = 1;
+	int totalVtx = 2*(slicesX+1)*(slicesZ+1) + 2*(slicesX+1)*(slicesY+1) + 2*(slicesY+1)*(slicesZ+1); //número de vértices dos 6 planos que vamos gerar
+	int totalFaces = (2*totalVtx - 24); //removemos as faces dos vértices repetidos
+	int vtxNb[totalFaces*3];
+	float vtx [totalVtx][3];
+	float orig[3] = {0,0,0};
+	int done = 0;
+
+	//faces do eixo x
+	orig[0] = xDim/2;
+	orig[1] = 0;
+	orig[2] = 0;
+	done += planeVertex(orig,0,M_PI/2,zDim,yDim,slicesZ,slicesY,&vtxPts,vtx,vtxNb + done); // z e y podem estar ao contr[ario]
+	printf("%d\n",done );
+	orig[0]*=-1;
+	done += planeVertex(orig,0,-M_PI/2,zDim,yDim,slicesZ,slicesY,&vtxPts,vtx,vtxNb + done);
+	
+	//faces do eixo y
+	orig[0] = 0;
+	orig[1] = yDim/2;
+	orig[2] = 0;
+	done += planeVertex(orig,0,0,xDim,zDim,slicesX,slicesZ,&vtxPts,vtx,vtxNb + done);
+	orig[1]*=-1;
+	done += planeVertex(orig,0,0,xDim,zDim,slicesX,slicesZ,&vtxPts,vtx,vtxNb + done);
+
+	orig[0] = 0;
+	orig[1] = 0;
+	orig[2] = zDim/2;
+	done += planeVertex(orig,M_PI/2,0,xDim,yDim,slicesX,slicesY,&vtxPts,vtx,vtxNb + done);
+	orig[2] *= -1;
+	done += planeVertex(orig,-M_PI/2,0,xDim,yDim,slicesX,slicesY,&vtxPts,vtx,vtxNb + done);
+
+
+	MyFile << totalVtx;
+	MyFile << totalFaces;
+
+
+	for (int i = 0; i < totalVtx; i++){
+		printf("%d: %f , %f , %f\n",i+1,vtx[i][0],vtx[i][1],vtx[i][2] ); 	
+	}
+	for (int i = 0; i < done; i+=3){
+		printf("%d %d %d \n", vtxNb[i],vtxNb[i+1],vtxNb[i+2]);
+	}
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////// MAIN //////////////////////////////////////////////////////////
+int main(int argc, char const *argv[]){
+	boxDr(10,20,10,1,2,1);
+	//circleDr(30,4,2);
+	//coneDr(30,20,4,10);
+	
+	//planeDr(20,20,1,1);
+
+	return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+nV
+nF
+x1
+y1
+z1
+1
+2
+3
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*int boxVertex(float xDim, float yDim, float zDim,int slicesX, int slicesY, int slicesZ,int totalVtx, float vtx[totalVtx][3], int totalFaces, int vtxNb[]){
 	int vtxPts = 1;
 	int aux[((slicesZ-1)*2) + (slicesY-1) + 4][((slicesX-1)*2) + ((slicesZ-1)*2) + 4];
 	float xSZ = xDim/slicesX;
@@ -197,6 +321,8 @@ int boxVertex(float xDim, float yDim, float zDim,int slicesX, int slicesY, int s
 			}
 		}
 	}
+
+
 	//return trisPolyLine(slicesY+2,slicesX+slicesZ+2,aux,vtxNb);
 }
 
@@ -215,22 +341,4 @@ int boxDr(float xDim, float yDim, float zDim,int slicesX, int slicesY, int slice
 	//	printf("%d %d %d \n", vtxNb[i],vtxNb[i+1],vtxNb[i+2]);
 	//}
 }
-
-
-
-int main(int argc, char const *argv[]){
-	//int vtx[4][3] = {{-1,1,-1},{1,3,4},{5,6,7},{8,8,8}};
-	//int res[L*3];
-	//for (int i = 0; i < L*3; ++i){
-	//	res[i] = -1;
-	//}
-	//trisPolyLine(4,3,vtx,res);
-	//for (int i = 0; i < L*3; ++i){
-	//	printf("%d ",res[i]);
-	//}
-	//boxDr(10,10,10,2,4,2);
-	//circleDr(30,4,2);
-	//coneDr(30,20,4,10);
-	planeDr(20,15,2,2);
-	return 0;
-}
+*/
