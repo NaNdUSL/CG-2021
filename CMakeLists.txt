@@ -20,16 +20,24 @@ if  (WIN32)
 
 	message(STATUS "Toolkits_DIR set to: " ${TOOLKITS_FOLDER})
 	set(TOOLKITS_FOLDER "" CACHE PATH "Path to Toolkits folder")
+
+	message(STATUS "TinyXml2_DIR set to: " ${TINYXML2_FOLDER})
+	set(TINYXML2_FOLDER "" CACHE PATH "Path to TinyXml2 folder")
 	
 	if (NOT EXISTS "${TOOLKITS_FOLDER}/glut/GL/glut.h" OR NOT EXISTS "${TOOLKITS_FOLDER}/glut/glut32.lib")
 		message(ERROR ": GLUT not found")
 	endif (NOT EXISTS "${TOOLKITS_FOLDER}/glut/GL/glut.h" OR NOT EXISTS "${TOOLKITS_FOLDER}/glut/glut32.lib")	
 	
+	if (NOT EXISTS "${TINYXML2_FOLDER}/tinyxml2.h" OR NOT EXISTS "${TINYXML2_FOLDER}/tinyxml2.cpp")
+		message(ERROR ": TinyXml2 not found")
+	endif (NOT EXISTS "${TINYXML2_FOLDER}/tinyxml2.h" OR NOT EXISTS "${TINYXML2_FOLDER}/tinyxml2.cpp")	
 	
 	include_directories(${TOOLKITS_FOLDER}/glut )
 	target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} 
 										  ${TOOLKITS_FOLDER}/glut/glut32.lib)
 	
+	include_directories(${TINYXML2_FOLDER} )
+
 	if (EXISTS "${TOOLKITS_FOLDER}/glut/glut32.dll" )
 		file(COPY ${TOOLKITS_FOLDER}/glut/glut32.dll DESTINATION ${CMAKE_BINARY_DIR})
 	endif(EXISTS "${TOOLKITS_FOLDER}/glut/glut32.dll" )	
