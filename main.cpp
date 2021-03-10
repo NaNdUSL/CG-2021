@@ -7,6 +7,7 @@
 
 #include <math.h>
 #include <stdio.h>
+#include "remk.cpp"
 
 
 // cam movement
@@ -97,11 +98,15 @@ void control(int x, int y){
 }
 
 
+int main(int argc, char const *argv[]){
+	//Cone(20,20,4,1,"efera.3D").build();
+	Sphere(5,4,1,"sphere.3D").build();
+	return 0;
+}
 
 
 
-
-int main(int argc, char **argv) {
+/*int main(int argc, char **argv) {
 	clindro.setVars(3.0f,3.0f,1000);
 // init GLUT and the window
 	glutInit(&argc, argv);
@@ -133,3 +138,4 @@ int main(int argc, char **argv) {
 	
 	return 1;
 }
+*/

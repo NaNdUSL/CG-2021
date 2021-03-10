@@ -61,6 +61,7 @@ class Mesh{
 			for (int face:faces){
 				File2Wr << face << "\n";
 			}
+			File2Wr.close();
 		}
 
 		void build(){
@@ -86,26 +87,25 @@ class Sphere : public Mesh{
 
   		void shape(){
 
-          	float rat = (2*radius)/(stacks+1);
 			float freqalf = (2*M_PI)/slices;
 			float freqbet = (M_PI)/(stacks+1);
           	int vtxPts = 1;
 
           	std::vector<int> row;
-          	
+
           	for (int st = 0; st < stacks+2; st++){
           		row.clear();
 				for (int sl = 0; sl < slices; sl++){
 					if (!(st == 0 || st == stacks+1) || sl == slices-1){
 						std::vector<float> aux;
 						aux.push_back((cos(freqbet*st - (M_PI/2))*radius)*sin(freqalf*sl));
-						aux.push_back((-radius) + st*rat);
+						aux.push_back((float)radius*sin(freqbet*st - (M_PI/2)));
 						aux.push_back((cos(freqbet*st - (M_PI/2))*radius)*cos(freqalf*sl));
 						(this->vertex).push_back(aux);
-						vtxPts++;
+						row.push_back(vtxPts++);
 					}
 
-					row.push_back(vtxPts);
+					else row.push_back(vtxPts);
  
 				}
 				(this->planar).push_back(row);
@@ -127,7 +127,7 @@ class Cone : public Sphere{
 		void shape(){	
           	int vtxPts = 1;
 			float rat = (radius)/stacks;
-			float heiStck = height/(stacks+1);
+			float heiStck = (float)height/(stacks+1);
 			float freq = (2*M_PI)/slices;
 			int inv;
 			
@@ -141,12 +141,16 @@ class Cone : public Sphere{
 						aux.clear();
 						inv = (stacks+1 - st)%(stacks+1);
 						aux.push_back((inv*rat)*sin(freq*sl));
-						aux.push_back((-(height))/2 + st*(heiStck));                   
+						aux.push_back((-(float)(height))/2 + (st-1)*(heiStck)); //HEIGHT ERRADA                   
 						aux.push_back((inv*rat)*cos(freq*sl));
+						
+						if (st == 0)aux[1] =(-(float)(height))/2;
+
 						(this->vertex).push_back(aux);
-						vtxPts++;
+						row.push_back(vtxPts++);
 					}
-					row.push_back(vtxPts);
+					else row.push_back(vtxPts);
+					
 				}
 				(this->planar).push_back(row);
 			}
@@ -241,8 +245,8 @@ class Box : public Mesh{
 		}
 
 		void shape(){
-			planeFaces.push_back(Plane(yDim,zDim,slicesY,slicesZ,"",{xDim/2,0,0},0,M_PI/2));
-			planeFaces.push_back(Plane(yDim,zDim,slicesY,slicesZ,"",{-xDim/2,0,0},0,-M_PI/2));
+			planeFaces.push_back(Plane(yDim,zDim,slicesY,slicesZ,"",{xDim/2,0,0},0,-M_PI/2));
+			planeFaces.push_back(Plane(yDim,zDim,slicesY,slicesZ,"",{-xDim/2,0,0},0,M_PI/2));
 			
 			planeFaces.push_back(Plane(xDim,zDim,slicesX,slicesZ,"",{0,yDim/2,0},0,0));
 			planeFaces.push_back(Plane(xDim,zDim,slicesX,slicesZ,"",{0,-yDim/2,0},0,M_PI));
@@ -278,15 +282,36 @@ class Box : public Mesh{
         }
 };
 
-
-
-
-
-
-
-
 int main(int argc, char const *argv[]){
-	//Cone(20,20,4,1,"efera.3D").build();
+	//Cone(20,10,20,10,"efera.3D").build();
 	Box(10,10,10,1,1,1,"efera.3D").build();
+	//Sphere(5,20,20,"efera.3D").build();
+	//parseExecute(argv);
 	return 0;
 }
+
+
+
+//void parseExecute(int argc,char **argv){
+//    
+//    int i = 2;
+//    int valArgs[5];
+//    char* file;
+//    char* object = argv[0];
+//
+//    for (int i = 2; i < argc; ++i){
+//    	
+//    }
+//    
+//    while (strspn(argv[i], "0123456789")){
+//        valArgs[i-2] = atoi(argv[i]);
+//        i++;
+//    }
+//
+//    file = strdup(argv[i]);
+//
+//    if (strcmp(object, "plane")) Plane(valArgs[0],valArgs[1],valArgs[2],valArgs[3],file);
+//    else if (strcmp(object, "box")) Box(valArgs[0],valArgs[1],valArgs[2],valArgs[3], valArgs[4], valArgs[5],file);
+//    else if (strcmp(object, "sphere")) Sphere(valArgs[0],valArgs[1],valArgs[2],file);
+//    else if (strcmp(object, "cone")) Cone(valArgs[0],valArgs[1],valArgs[2],valArgs[3],file);
+//}
