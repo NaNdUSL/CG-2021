@@ -282,13 +282,13 @@ class Box : public Mesh{
         }
 };
 
-int main(int argc, char const *argv[]){
-	//Cone(20,10,20,10,"efera.3D").build();
-	Box(10,10,10,1,1,1,"efera.3D").build();
-	//Sphere(5,20,20,"efera.3D").build();
-	//parseExecute(argv);
-	return 0;
-}
+//int main(int argc, char const *argv[]){
+//	//Cone(20,10,20,10,"efera.3D").build();
+//	Box(10,10,10,1,1,1,"efera.3D").build();
+//	//Sphere(5,20,20,"efera.3D").build();
+//	//parseExecute(argv);
+//	return 0;
+//}
 
 
 
