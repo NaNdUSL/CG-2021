@@ -131,7 +131,7 @@ void control(int x, int y){
 
 int main(int argc,  char **argv) {
 	vector<const char*> list_xml = vector<const char*> ();
-	readXML("te.xml",list_xml);
+	readXML("testeScenes/te.xml",list_xml);
 
 	for(const char * file_name : list_xml){
 		read_file(file_name,vertex_list,faces_list);
