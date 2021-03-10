@@ -141,7 +141,7 @@ class Cone : public Sphere{
 						aux.clear();
 						inv = (stacks+1 - st)%(stacks+1);
 						aux.push_back((inv*rat)*sin(freq*sl));
-						aux.push_back((-(float)(height))/2 + (st-1)*(heiStck)); //HEIGHT ERRADA                   
+						aux.push_back((-(float)(height))/2 + (st)*(heiStck)); //HEIGHT ERRADA                   
 						aux.push_back((inv*rat)*cos(freq*sl));
 						
 						if (st == 0)aux[1] =(-(float)(height))/2;
@@ -282,13 +282,13 @@ class Box : public Mesh{
         }
 };
 
-//int main(int argc, char const *argv[]){
-//	//Cone(20,10,20,10,"efera.3D").build();
-//	Box(10,10,10,1,1,1,"efera.3D").build();
-//	//Sphere(5,20,20,"efera.3D").build();
-//	//parseExecute(argv);
-//	return 0;
-//}
+int main(int argc, char const *argv[]){
+	Cone(20,10,20,10,"efera.3D").build();
+	//Box(10,10,10,1,1,1,"efera.3D").build();
+	//Sphere(5,20,20,"efera.3D").build();
+	//parseExecute(argv);
+	return 0;
+}
 
 
 
