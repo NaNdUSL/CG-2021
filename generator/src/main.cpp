@@ -1,6 +1,7 @@
 #include <math.h>
 #include <iostream>
 #include <fstream>
+#include <string.h>
 #include <vector>
 
 
@@ -283,7 +284,27 @@ class Box : public Mesh{
 };
 
 int main(int argc, char const *argv[]){
-	Cone(20,10,20,10,"efera.3D").build();
+
+	if(!strcmp(argv[1], "plane")){
+		Plane(atoi(argv[2])/2,atoi(argv[2])/2,1,1,argv[3]).build();
+	}
+
+	else if (!strcmp(argv[1], "box")){
+		Box(atoi(argv[2]),atoi(argv[3]),atoi(argv[4]),atoi(argv[5]),atoi(argv[6]),atoi(argv[7]),argv[8]).build();
+	}
+	
+	else if (!strcmp(argv[1], "sphere")){		
+		Sphere(atoi(argv[2]),atoi(argv[3]),atoi(argv[4]),argv[5]).build();
+	}
+
+	else if (!strcmp(argv[1], "cone")){
+		Cone(atoi(argv[2]),atoi(argv[3]),atoi(argv[4]),atoi(argv[5]),argv[6]).build();
+	}
+
+	else{
+		printf("Error: Generator called with invalid arguments!\n");
+	}
+	//Cone(20,10,20,10,"efera.3D").build();
 	//Box(10,10,10,1,1,1,"efera.3D").build();
 	//Sphere(5,20,20,"efera.3D").build();
 	//parseExecute(argv);

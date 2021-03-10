@@ -2,7 +2,7 @@
 #define FPR 2 //fixed point rotation - FPS
 #define ZOM 3 //zooming
 
-class CamObj{
+class Camera{
 	public:
 	int moveState;
 	int clickX,clickY;
@@ -106,72 +106,5 @@ class CamObj{
 		center[0],center[1],center[2],
 		0.0f, 1.0f, 0.0f
 		);
-	}
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-class Cylinder
-{
-	public:
-		GLfloat radius,height;
-		int slices;
-
-	void setVars(GLfloat radius,GLfloat height, int slices){
-		this->radius = radius;
-		this->height = height;
-		this->slices = slices;
-	}
-
-	void draw(){
-		GLfloat points[(1+slices)*2] [3];
-		int i;
-		glPolygonMode(GL_FRONT, GL_FILL);
-		float t = (float) slices;
-
-		for (i = 0; i < slices; i++){
-			glBegin(GL_POLYGON);
-
-			glColor3f(0.0f, i/t, 1.0f);
-			glVertex3f(radius * sin(((2*M_PI)/slices) * i),(height),radius * cos(((2*M_PI)/slices) * i));
-			glVertex3f(radius * sin(((2*M_PI)/slices) * (i+1)),(height),radius * cos(((2*M_PI)/slices) * (i+1)));
-			glVertex3f(0,(height),0);
-			glEnd();
-
-			glBegin(GL_POLYGON);
-			glColor3f(0.0f, i/t, 1.0f);
-			glVertex3f(radius * sin(((2*M_PI)/slices) * (i+1)),0,radius * cos(((2*M_PI)/slices) * (i+1)));
-			glVertex3f(radius * sin(((2*M_PI)/slices) * i),0,radius * cos(((2*M_PI)/slices) * i));
-			glVertex3f(0,0,0);
-			glEnd();
-
-
-			glBegin(GL_POLYGON);
-			glColor3f(i/t, 0.0f, 1.0f);
-			
-			glVertex3f(radius * sin(((2*M_PI)/slices) * i),(height),radius * cos(((2*M_PI)/slices) * i));
-			glVertex3f(radius * sin(((2*M_PI)/slices) * (i+1)),(height),radius * cos(((2*M_PI)/slices) * (i+1)));
-			glVertex3f(radius * sin(((2*M_PI)/slices) * i),0,radius * cos(((2*M_PI)/slices) * i));
-			glEnd();
-			
-			glBegin(GL_POLYGON);
-			glColor3f(i/t, 0.0f, 1.0f);
-			glVertex3f(radius * sin(((2*M_PI)/slices) * i),0,radius * cos(((2*M_PI)/slices) * i));
-			glVertex3f(radius * sin(((2*M_PI)/slices) * (i+1)),0,radius * cos(((2*M_PI)/slices) * (i+1)));
-			glVertex3f(radius * sin(((2*M_PI)/slices) * (i+1)),height,radius * cos(((2*M_PI)/slices) * (i+1)));
-			glEnd();
-		}
-
 	}
 };

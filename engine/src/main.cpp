@@ -12,31 +12,25 @@
 #include <fstream>
 #include "tinyxml2.h"
 #include "tinyxml2.cpp"
+#include "string.h"
 
 using namespace tinyxml2;
-using namespace std;
+//using namespace std;
 // cam movement
 #include "cam.cpp"
+#include "model.cpp"
+#include <unistd.h>
 
+//vector<vector<float>> vertex_list;
+//vector<vector<int>> faces_list;
 
-vector<vector<float>> vertex_list;
-vector<vector<int>> faces_list;
+Camera cam;
+std::vector<Model> models;
 
-CamObj camera;
-Cylinder clindro;
-class Node{
-public:
-	const char* file_name;
-
-Node* next;
-};
-
-void draw_model(vector<vector<float>> &vertex_list, vector<vector<int>> &faces_list);
-void readXML(const char* xmlName, vector<const char*> &list_xml);
-void read_file(const char* file_name, vector<vector<float>> &vertex_list, vector<vector<int>> &faces_list);
-void printList(Node* list);
-void insertList(const char* file_name, Node** list);
-Node createNode(const char* file_name);
+//void draw_model(vector<vector<float>> &vertex_list, vector<vector<int>> &faces_list);
+void readXML(const char* xmlName, std::vector<std::string> &listXML);
+void printModels();
+//void read_file(const char* file_name, vector<vector<float>> &vertex_list, vector<vector<int>> &faces_list);
 
 void changeSize(int w, int h) {
 
@@ -93,19 +87,14 @@ void renderScene(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 
-	camera.place();
+	cam.place();
 
 
 	axis();
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glBegin(GL_TRIANGLES);
-	for(vector<int> v : faces_list){
-
-		for(int vertex : v){
-			glVertex3f(vertex_list[vertex][0],vertex_list[vertex][1],vertex_list[vertex][2]);
-		}
-	}
-	glEnd();
+	//printf("tudo fixe\n");
+	printModels();
+	//printf("tudo fixe!\n");
 
 	
 	// End of frame
@@ -116,12 +105,12 @@ void renderScene(void) {
 
 
 void detectMouseButs(int button, int state, int x, int y){
-	camera.detectCamMouse(button,state,x,y);
+	cam.detectCamMouse(button,state,x,y);
 }
 
 
 void control(int x, int y){
-	camera.controlCamera(x,y);
+	cam.controlCamera(x,y);
 }
 
 
@@ -130,23 +119,24 @@ void control(int x, int y){
 
 
 int main(int argc,  char **argv) {
-	vector<const char*> list_xml = vector<const char*> ();
-	readXML("testeScenes/te.xml",list_xml);
+	//Model model;
+	std::vector<std::string> listXML = std::vector<std::string> ();
+	readXML("te.xml",listXML);
 
-	for(const char * file_name : list_xml){
-		read_file(file_name,vertex_list,faces_list);
-		//draw_model(vertex_list,faces_list);
+	int i = 0;
+	for(std::string fileName : listXML){
+		//printf("MAIN %d\n", fileName);
+		models.push_back(Model(fileName));
+		i++;
 	}
 
-	int k = 1;
-	for(vector<int> v : faces_list){
-		for(int vertex : v){
-			printf("TOU A TENTAR ACESSAR %d\n", vertex);
-			printf("PONTO %d: %f %f %f\n",vertex,vertex_list[vertex][0],vertex_list[vertex][1],vertex_list[vertex][2]);
-		}
-	}
-	
-	printf("OLA\n");
+	//printf("i: %d\n", i);
+
+	/*for(Model m : models){
+		printf("FILE NAME: %s\n", m.file_name);
+	} */
+
+	//printf("MODELS SIZE%d\n", models.size());
 
 	//clindro.setVars(3.0f,3.0f,1000);
 // init GLUT and the window
@@ -181,7 +171,7 @@ int main(int argc,  char **argv) {
 } 
 
 
-void readXML(const char* xmlName, vector<const char*> &list_xml){
+void readXML(const char* xmlName, std::vector<std::string> &listXML){
 	//Variável XMLDocument armazena o ficheiro XML estruturadamente
 	XMLDocument doc;
 	doc.LoadFile(xmlName);
@@ -191,7 +181,11 @@ void readXML(const char* xmlName, vector<const char*> &list_xml){
 	// 3- ficheiro não encontrado
 	// 7- erro no XML
 	int y = doc.ErrorID();
-	printf(" ERRO: %d\n", y);
+
+	if(y != 0){
+		printf(" ERRO: %d\n", y);
+	}
+	
 
 	//O método FirstChildElement procura um elemento com o nome especificado e "entra" nesse elemento (altera o nível de profundidade)
 	// da travessia. Neste caso executamos o método 2 vezes pq temos <scene> -> <model>
@@ -201,16 +195,21 @@ void readXML(const char* xmlName, vector<const char*> &list_xml){
 	//const char* str = nomeFile->Attribute("file");
 
 	XMLElement* iterator;
-	Node* ficheiros = NULL;
 
 	for(iterator = doc.FirstChildElement()->FirstChildElement(); iterator != NULL; iterator = iterator->NextSiblingElement()){
 		const char* file_name = iterator->Attribute("file");
-		list_xml.push_back(file_name);
+		listXML.push_back(std::string(file_name));
 	}
 
 }
 
-void read_file(const char* file_name, vector<vector<float>> &vertex_list, vector<vector<int>> &faces_list){
+void printModels(){
+	for(Model m : models){
+		m.draw();
+	}
+}
+
+/*void read_file(const char* file_name, std::vector<vector<float>> &vertex_list, vector<vector<int>> &faces_list){
 	ifstream model;
 	model.open(file_name);
 	int num_vertices;
@@ -219,7 +218,6 @@ void read_file(const char* file_name, vector<vector<float>> &vertex_list, vector
 
 	model >> num_vertices;
 	model >> num_faces;
-	//vector<vector<float>> vertex_list;
 
 	for(int i = 0; i < num_vertices;i++){
 		vertex_list.push_back(vector<float>());
@@ -230,7 +228,6 @@ void read_file(const char* file_name, vector<vector<float>> &vertex_list, vector
 		}
 	}
 
-	//vector<vector<int>> faces_list;
 	aux = (int) aux;
 	for(int i = 0; i < num_faces; i++){
 		faces_list.push_back(vector<int>());
@@ -250,18 +247,4 @@ void draw_model(vector<vector<float>> &vertex_list, vector<vector<int>> &faces_l
 	}
 	glEnd();
 
-}
-
-void insertList(const char* file_name, Node** headList){
-	Node* novo = new Node();
-	novo->file_name = strdup(file_name);
-
-	novo->next = *headList;
-
-	*headList = novo;
-}
-
-void printList(Node* list){
-	Node* aux;
-	for(aux = list; aux != NULL; aux = aux -> next) printf("%s\n", aux->file_name);
-}
+} */
