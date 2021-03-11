@@ -114,6 +114,9 @@ void control(int x, int y){
 }
 
 
+void keyInput(unsigned char key, int x, int y){
+	cam.detectKeyboard(key,x,y);
+}
 
 
 
@@ -156,7 +159,7 @@ int main(int argc,  char **argv) {
 // put here the registration of the keyboard callbacks
 	//glutMouseFunc(detectMouseButs);
 	//glutMotionFunc(control);
-	//glutKeyboardFunc(keyInput);
+	glutKeyboardFunc(keyInput);
 	//glutSpecialFunc(specialInput);
 
 
