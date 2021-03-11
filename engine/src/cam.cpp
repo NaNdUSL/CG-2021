@@ -42,7 +42,7 @@ class Camera{
 	std::vector<GLfloat> pos{std::vector<GLfloat> (3)};
 	std::vector<GLfloat> center{std::vector<GLfloat> (3)};
 
-	CamObj(){
+	Camera(){
 		this->moveState = 0;
 		this->clickX = 0;
 		this->clickY = 0;

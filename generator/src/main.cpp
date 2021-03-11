@@ -76,10 +76,11 @@ class Mesh{
 
 class Sphere : public Mesh{
 	public:
-		int radius,slices,stacks;
+		float radius;
+		int slices,stacks;
 		
   		
-  		Sphere(int radius, int slices, int stacks,const char* fileName):Mesh(fileName){
+  		Sphere(float radius, int slices, int stacks,const char* fileName):Mesh(fileName){
           	this->radius = radius;
           	this->stacks = stacks;
           	this->slices = slices;
@@ -120,15 +121,15 @@ class Sphere : public Mesh{
 
 class Cone : public Sphere{
 	public:
-		int height;
-		Cone(int height,int radius, int slices, int stacks,const char* fileName) :Sphere(radius,slices,stacks,fileName){
+		float height;
+		Cone(float height,float radius, int slices, int stacks,const char* fileName) :Sphere(radius,slices,stacks,fileName){
 			(this->height) = height;
 		}
 
 		void shape(){	
           	int vtxPts = 1;
 			float rat = (radius)/stacks;
-			float heiStck = (float)height/(stacks+1);
+			float heiStck = height/(stacks);
 			float freq = (2*M_PI)/slices;
 			int inv;
 			
@@ -141,11 +142,11 @@ class Cone : public Sphere{
 					if (!(st == 0 || st == stacks+1) || sl == slices-1){
 						aux.clear();
 						inv = (stacks+1 - st)%(stacks+1);
-						aux.push_back((inv*rat)*sin(freq*sl));
-						aux.push_back((-(float)(height))/2 + (st)*(heiStck)); //HEIGHT ERRADA                   
-						aux.push_back((inv*rat)*cos(freq*sl));
+						aux.push_back((rat*inv)*sin(freq*sl));
+						aux.push_back((-(height))/2 +(heiStck)*(st-1));                   
+						aux.push_back((rat*inv)*cos(freq*sl));
 						
-						if (st == 0)aux[1] =(-(float)(height))/2;
+						if (st == 0)aux[1] =(-(height))/2;
 
 						(this->vertex).push_back(aux);
 						row.push_back(vtxPts++);
@@ -284,55 +285,6 @@ class Box : public Mesh{
 };
 
 int main(int argc, char const *argv[]){
-
-	if(!strcmp(argv[1], "plane")){
-		Plane(atoi(argv[2])/2,atoi(argv[2])/2,1,1,argv[3]).build();
-	}
-
-	else if (!strcmp(argv[1], "box")){
-		Box(atoi(argv[2]),atoi(argv[3]),atoi(argv[4]),atoi(argv[5]),atoi(argv[6]),atoi(argv[7]),argv[8]).build();
-	}
-	
-	else if (!strcmp(argv[1], "sphere")){		
-		Sphere(atoi(argv[2]),atoi(argv[3]),atoi(argv[4]),argv[5]).build();
-	}
-
-	else if (!strcmp(argv[1], "cone")){
-		Cone(atoi(argv[2]),atoi(argv[3]),atoi(argv[4]),atoi(argv[5]),argv[6]).build();
-	}
-
-	else{
-		printf("Error: Generator called with invalid arguments!\n");
-	}
-	//Cone(20,10,20,10,"efera.3D").build();
-	//Box(10,10,10,1,1,1,"efera.3D").build();
-	//Sphere(5,20,20,"efera.3D").build();
-	//parseExecute(argv);
-	return 0;
 }
 
 
-
-//void parseExecute(int argc,char **argv){
-//    
-//    int i = 2;
-//    int valArgs[5];
-//    char* file;
-//    char* object = argv[0];
-//
-//    for (int i = 2; i < argc; ++i){
-//    	
-//    }
-//    
-//    while (strspn(argv[i], "0123456789")){
-//        valArgs[i-2] = atoi(argv[i]);
-//        i++;
-//    }
-//
-//    file = strdup(argv[i]);
-//
-//    if (strcmp(object, "plane")) Plane(valArgs[0],valArgs[1],valArgs[2],valArgs[3],file);
-//    else if (strcmp(object, "box")) Box(valArgs[0],valArgs[1],valArgs[2],valArgs[3], valArgs[4], valArgs[5],file);
-//    else if (strcmp(object, "sphere")) Sphere(valArgs[0],valArgs[1],valArgs[2],file);
-//    else if (strcmp(object, "cone")) Cone(valArgs[0],valArgs[1],valArgs[2],valArgs[3],file);
-//}
