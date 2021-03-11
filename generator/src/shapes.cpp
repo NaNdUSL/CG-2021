@@ -344,3 +344,62 @@ class Box : public Mesh{
           this->write3DFile();
         }
 };
+
+
+
+
+
+
+/*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+
+
+
+
+class Cylinder : public Cone{
+	public:
+
+		Cylinder(float radius, float height, int slices, int stacks,const char* fileName):Cone(radius,height,slices, stacks,fileName){
+		}
+
+		void shape(){	
+          	int vtxPts = 1;
+			float heiStck = height/(stacks);
+			float freq = (2*M_PI)/slices;
+			int inv;
+			
+			std::vector<int> row;
+			std::vector<float> aux;
+
+			for (int st = 0; st <= stacks+2; st++){
+				row.clear();
+				for (int sl = 0; sl < slices; sl++){
+					if (!(st == 0 || st == stacks+1) || sl == slices-1){
+						aux.clear();
+						inv = (stacks+2 - st)%(stacks+2);
+						aux.push_back(radius*sin(freq*sl));
+						aux.push_back((-(height))/2 +(heiStck)*(st-1));                   
+						aux.push_back(radius*cos(freq*sl));
+						
+						if (st == 0){
+							aux[0] = 0;
+							aux[1] = (-(height))/2;
+							aux[2] = 0;
+						} 
+						
+						if (st == stacks+2){
+							aux[0] = 0;
+							aux[1] = (height)/2;
+							aux[2] = 0;
+						}
+
+						(this->vertex).push_back(aux);
+						row.push_back(vtxPts++);
+					}
+					else row.push_back(vtxPts);
+					
+				}
+				(this->planar).push_back(row);
+			}
+		}	
+};

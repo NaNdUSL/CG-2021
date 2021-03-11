@@ -79,6 +79,7 @@ class Camera{
 		}
 		this->clickX = x;
 		this->clickY = y;
+		glutPostRedisplay();
 	}
 
 	void controlCamera(int x, int y){
@@ -169,9 +170,8 @@ class Camera{
 
 			default:
 				break;
-
-		glutPostRedisplay();
 		}
+		glutPostRedisplay();
 	}
 
 	void calcCenterP(){
