@@ -17,7 +17,7 @@
 #include "string.h"
 
 using namespace tinyxml2;
-
+ 
 
 // Source Files
 #include "cam.cpp"
@@ -30,8 +30,14 @@ Camera cam;
 // Models of the scene
 std::vector<Model> models;
 
+
+// - Engine Runtime Options
 // Mode of polygon (fill / line)
 int polyMode = GL_FILL;
+// Origin Axis
+int oAxisDr = 100;
+// cameraCenter Axis
+int ccAxisDr = 0;
 
 
 void changeSize(int w, int h);
@@ -72,40 +78,67 @@ void changeSize(int w, int h) {
 }
 
 
-
+// Draw the axis centered on Origin
 void axis(){
 	glBegin(GL_LINES);
 	// X axis in red
 	glColor3f(1.0f, 0.0f, 0.0f);
 	glVertex3f(0.0f, 0.0f, 0.0f);
-	glVertex3f( 10.0f, 0.0f, 0.0f);
+	glVertex3f( oAxisDr, 0.0f, 0.0f);
 	// Y Axis in Green
 	glColor3f(0.0f, 1.0f, 0.0f);
 	glVertex3f(0.0f,0.0f, 0.0f);
-	glVertex3f(0.0f, 1.0f, 0.0f);
+	glVertex3f(0.0f, oAxisDr, 0.0f);
 	// Z Axis in Blue
 	glColor3f(0.0f, 0.0f, 1.0f);
 	glVertex3f(0.0f, 0.0f,0.0f);
-	glVertex3f(0.0f, 0.0f, 10.0f);
+	glVertex3f(0.0f, 0.0f, oAxisDr);
+	glEnd();
+}
+
+
+// Draww the axis centered on CameraCenter
+void ccAxis(){
+	glBegin(GL_LINES);
+	// X axis in red
+	glColor3f(1.0f, 0.0f, 0.0f);
+	glVertex3f(cam.center[0], cam.center[1], cam.center[2]);
+	glVertex3f(cam.center[0]+0.5f, cam.center[1], cam.center[2]);
+	// Y Axis in Green
+	glColor3f(0.0f, 1.0f, 0.0f);
+	glVertex3f(cam.center[0], cam.center[1], cam.center[2]);
+	glVertex3f(cam.center[0], cam.center[1]+0.5f, cam.center[2]);
+	// Z Axis in Blue
+	glColor3f(0.0f, 0.0f, 1.0f);
+	glVertex3f(cam.center[0], cam.center[1], cam.center[2]);
+	glVertex3f(cam.center[0], cam.center[1], cam.center[2]+0.5f);
 	glEnd();
 }
 
 
 
-
 void renderScene(void) {
+	// - Scene Runtime options
+	glClearColor(0.2f,0.2f,0.3f,0.2f);
+	glPolygonMode(GL_FRONT_AND_BACK, polyMode);
+		
+
 	// clear buffers
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 
-	// places the camera on the scene
-	cam.place();
 
-	// draw axis
-	axis();
+	// places the camera on the scene and draw Axis
+	cam.place();
+	if (oAxisDr) axis();
+	if (ccAxisDr) ccAxis();
+
+	
+	
+
 
 	// Draw Scene
-	glPolygonMode(GL_FRONT_AND_BACK, polyMode);
+	glColor3f(0.5f,0.5f,0.5f);
 	drawModelsVBO();
 
 	// End of frame
@@ -125,10 +158,27 @@ void control(int x, int y){
 }
 
 void keyInput(unsigned char key, int x, int y){
-	cam.detectKeyboard(key,x,y);
-	if (key == 'm') {
+	cam.detectKeyboard(key,x,y); // this reservers the keys "W A S D C [space] R"
+	
+	switch (key){
+		case 'm':
 		if (polyMode == GL_FILL) polyMode = GL_LINE;
 		else polyMode = GL_FILL;
+		break;
+
+		case 'o':
+		if (oAxisDr == 10) oAxisDr = 0;
+		else if (oAxisDr == 100) oAxisDr = 10;
+		else oAxisDr = 100;
+		break;
+
+		case 'i':
+		if (ccAxisDr) ccAxisDr = 0;
+		else ccAxisDr = 1;
+		break;
+		
+		default:
+		break;
 	}
 }
 
