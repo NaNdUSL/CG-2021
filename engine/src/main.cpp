@@ -30,6 +30,9 @@ Camera cam;
 // Models of the scene
 std::vector<Model> models;
 
+// Mode of polygon (fill / line)
+int polyMode = GL_FILL;
+
 
 void changeSize(int w, int h);
 void axis();
@@ -102,7 +105,7 @@ void renderScene(void) {
 	axis();
 
 	// Draw Scene
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glPolygonMode(GL_FRONT_AND_BACK, polyMode);
 	drawModelsVBO();
 
 	// End of frame
@@ -123,6 +126,10 @@ void control(int x, int y){
 
 void keyInput(unsigned char key, int x, int y){
 	cam.detectKeyboard(key,x,y);
+	if (key == 'm') {
+		if (polyMode == GL_FILL) polyMode = GL_LINE;
+		else polyMode = GL_FILL;
+	}
 }
 
 

@@ -25,8 +25,6 @@ class Model{
 			glVertex3f(vertexList[(3*i)],vertexList[3*i+1],vertexList[3*i+2]);
 		}
 		glEnd();
-
-
 	}
 
 	void drawVBO(){
@@ -56,7 +54,6 @@ class Model{
 			vertexList.push_back(auxf);
 		}
 
-	
 		for(int i = 0; i < 3*numFaces; i++){
 			mod >> auxi;
 			facesList.push_back(auxi-1);

@@ -72,7 +72,7 @@ class Mesh{
 			std::ofstream File2Wr;
 			File2Wr.open(this->fileName);
 			File2Wr << vex << "\n" << facs <<"\n";
-			for (std::vector<float>&v : this->vertex){
+			for (std::vector<float> &v : this->vertex){
 				for (float &point : v){
 					File2Wr << point << "\n";
 				}
@@ -86,10 +86,10 @@ class Mesh{
 
 		// - Método que gera o shape, a malha e escreve em ficheiro
 		void build(){
-          this->shape();
-          this->trisPolyLine();
-          this->write3DFile();
-        }
+			this->shape();
+			this->trisPolyLine();
+			this->write3DFile();
+		}
 };
 
 
@@ -360,13 +360,13 @@ class Cylinder : public Cone{
 	public:
 
 		Cylinder(float radius, float height, int slices, int stacks,const char* fileName):Cone(radius,height,slices, stacks,fileName){
+			this->vex = (slices*(stacks+1)) + 2;
 		}
 
 		void shape(){	
           	int vtxPts = 1;
 			float heiStck = height/(stacks);
 			float freq = (2*M_PI)/slices;
-			int inv;
 			
 			std::vector<int> row;
 			std::vector<float> aux;
@@ -374,30 +374,31 @@ class Cylinder : public Cone{
 			for (int st = 0; st <= stacks+2; st++){
 				row.clear();
 				for (int sl = 0; sl < slices; sl++){
-					if (!(st == 0 || st == stacks+1) || sl == slices-1){
-						aux.clear();
-						inv = (stacks+2 - st)%(stacks+2);
+					aux.clear();
+					if ( st > 0 && st < stacks+2) {
 						aux.push_back(radius*sin(freq*sl));
 						aux.push_back((-(height))/2 +(heiStck)*(st-1));                   
 						aux.push_back(radius*cos(freq*sl));
 						
-						if (st == 0){
-							aux[0] = 0;
-							aux[1] = (-(height))/2;
-							aux[2] = 0;
-						} 
-						
-						if (st == stacks+2){
-							aux[0] = 0;
-							aux[1] = (height)/2;
-							aux[2] = 0;
-						}
-
 						(this->vertex).push_back(aux);
-						row.push_back(vtxPts++);
+						vtxPts++;
 					}
-					else row.push_back(vtxPts);
-					
+
+					else if (st == 0 && sl == slices-1){
+						aux.push_back(0);
+						aux.push_back((-(height))/2);
+						aux.push_back(0);
+						(this->vertex).push_back(aux);
+					} 
+						
+					else if (st == stacks+2 && sl == 0){
+						aux.push_back(0);
+						aux.push_back((height)/2);
+						aux.push_back(0);
+						vtxPts++;
+						(this->vertex).push_back(aux);
+					}	
+					row.push_back(vtxPts);			
 				}
 				(this->planar).push_back(row);
 			}
