@@ -6,10 +6,6 @@
 #define FCR 1 //fixed camera rotation - explorer
 #define FPR 2 //fixed point rotation - FPS
 #define ZOM 3 //zooming
-#define W 4	//forward
-#define A 5	//left
-#define D 6	//right
-#define S 7	//backwards
 
 float invSqrt(float number){
 	long i;
@@ -18,11 +14,11 @@ float invSqrt(float number){
 
 	x2 = number * 0.5F;
 	y  = number;
-	i  = * (long *) &y;                       // evil floating point bit level hacking
-	i  = 0x5f3759df - (i >> 1);               // what the fuck? 
+	i  = * (long *) &y;
+	i  = 0x5f3759df - (i >> 1);
 	y  = * (float *) &i;
-	y  = y * (threehalfs - (x2 * y * y));   // 1st iteration
-//	y  = y * (threehalfs - (x2 * y * y));   // 2nd iteration, this can be removed
+	y  = y * (threehalfs - (x2 * y * y));
+//	y  = y * (threehalfs - (x2 * y * y));
 
 	return y;
 }
@@ -35,24 +31,17 @@ class Camera{
 	GLdouble sensi;
 	GLdouble sensc;
 	
-	std::vector<GLfloat> posVec{std::vector<GLfloat> (3)};
-	std::vector<GLfloat> centerVec{std::vector<GLfloat> (3)};
-	std::vector<GLfloat> dirVec{std::vector<GLfloat> (3)};
-	
-	std::vector<GLfloat> pos{std::vector<GLfloat> (3)};
-	std::vector<GLfloat> center{std::vector<GLfloat> (3)};
+	std::vector<GLfloat> posVec{0.0f,0.0f,10.0f};
+	std::vector<GLfloat> centerVec{0.0f,0.0f,-10.0f};
+	std::vector<GLfloat> dirVec{1.0f, 1.0f, 1.0f};
+	std::vector<GLfloat> dirSide{0.0f, 0.0f, 0.0f};
+
+	std::vector<GLfloat> pos{0.0f, 0.0f, 0.0f};
+	std::vector<GLfloat> center{0.0f,0.0f,.0f};
 
 	Camera(){
-		this->moveState = 0;
-		this->clickX = 0;
-		this->clickY = 0;
-		this->sensi = 0.01f;
-		this->sensc = 0.1f;
-		this->posVec = {0.0f,0.0f,10.0f};
-		this->centerVec = {0.0f,0.0f,-10.0f};
-		this->dirVec = {1.0f, 1.0f, 1.0f};
-		calcPosP();
 		
+		reset();		
 	}
 	
 
@@ -93,7 +82,6 @@ class Camera{
 				this->centerVec[1] += yMove*sensi;
 			}
 			calcCenterP();
-			calcDir();
 			break;
 	
 			case ZOM:
@@ -101,7 +89,6 @@ class Camera{
 				this->posVec[2] += xMove*sensi;
 			}
 			calcPosP();
-			calcDir();
 			break;
 	
 			case FPR:
@@ -110,19 +97,16 @@ class Camera{
 				this->posVec[1] += yMove*sensi;
 			}
 			calcPosP();
-			calcDir();
 			break;
 	
 			default:
 			break;
 		}
+		//if ()
 		clickX = x;
 		clickY = y;
 		glutPostRedisplay();
 	}
-
-// se o vetor for paralelao ao y pode dar asneira e anular-se
-// o mesmo deve acontecer para as special keys por isso ter isso em conta
 
 
 	void detectKeyboard(unsigned char key, int x, int y){
@@ -168,6 +152,10 @@ class Camera{
 				this->center[1] -= 1*sensc;
 				break;
 
+			case 'r':
+				reset();
+				break;
+
 			default:
 				break;
 		}
@@ -193,10 +181,37 @@ class Camera{
 	}
 
 	void calcDir(){
-		float value = invSqrt((center[0] - pos[0])*(center[0] - pos[0]) + (center[1] - pos[1])*(center[1] - pos[1]) + (center[2] - pos[2])*(center[2] - pos[2]));
-		this->dirVec[0] = (center[0] - pos[0]) * value;
-		this->dirVec[1] = (center[1] - pos[1]) * value;
-		this->dirVec[2] = (center[2] - pos[2]) * value;
+		normalize((center[0] - pos[0]), (center[1] - pos[1]), (center[2] - pos[2]), this->dirVec);
+	}
+
+	void ortVec(std::vector<GLfloat> vec1, std::vector<GLfloat> vec2, std::vector<GLfloat> &retVec){
+		retVec.clear();
+		retVec.push_back(vec1[1]*vec1[2] - vec1[2]*vec1[1]);
+		retVec.push_back(vec1[2]*vec1[0] - vec1[0]*vec1[2]);
+		retVec.push_back(vec1[0]*vec1[1] - vec1[1]*vec1[0]);
+	}
+
+	void normalize(GLfloat x, GLfloat y, GLfloat z, std::vector<GLfloat> &retVec){
+		float value = invSqrt((x*x) + (y*y) + (z*z));
+		retVec[0] = x * value;
+		retVec[1] = y * value;
+		retVec[2] = z * value;
+	}
+
+	void reset(){
+
+		this->moveState = 0;
+		this->clickX = 0;
+		this->clickY = 0;
+		this->sensi = 0.01f;
+		this->sensc = 0.1f;
+		this->posVec = {0.0f,0.0f,10.0f};
+		this->centerVec = {0.0f,0.0f,-10.0f};
+		this->center = {0.0f,0.0f,0.0f};
+		calcDir();
+		std::vector<GLfloat> yAxis{0.0f,1.0f,0.0f};
+		ortVec(this->dirVec, yAxis, this->dirSide);
+		calcPosP();
 	}
 
 	void place(){
@@ -206,4 +221,5 @@ class Camera{
 		0.0f, 1.0f, 0.0f
 		);
 	}
+
 };
