@@ -102,7 +102,6 @@ class Camera{
 			default:
 			break;
 		}
-		//if ()
 		clickX = x;
 		clickY = y;
 		glutPostRedisplay();
@@ -115,31 +114,31 @@ class Camera{
 		switch (key){
 			
 			case 'w':
-				this->pos[0] += dirVec[0]*sensc;
-				this->pos[2] += dirVec[2]*sensc;
-				this->center[0] += dirVec[0]*sensc;
-				this->center[2] += dirVec[2]*sensc;
+				this->pos[0] += this->dirVec[0]*sensc;
+				this->pos[2] += this->dirVec[2]*sensc;
+				this->center[0] += this->dirVec[0]*sensc;
+				this->center[2] += this->dirVec[2]*sensc;
 				break;
 	
 			case 's':
-				this->pos[0] -= dirVec[0]*sensc;
-				this->pos[2] -= dirVec[2]*sensc;
-				this->center[0] -= dirVec[0]*sensc;
-				this->center[2] -= dirVec[2]*sensc;
+				this->pos[0] -= this->dirVec[0]*sensc;
+				this->pos[2] -= this->dirVec[2]*sensc;
+				this->center[0] -= this->dirVec[0]*sensc;
+				this->center[2] -= this->dirVec[2]*sensc;
 				break;
 
 			case 'a':
-				this->pos[0] += dirVec[2]*sensc;
-				this->pos[2] -= dirVec[0]*sensc;
-				this->center[0] += dirVec[2]*sensc;
-				this->center[2] -= dirVec[0]*sensc;
+				this->pos[0] += this->dirVec[2]*sensc;
+				this->pos[2] -= this->dirVec[0]*sensc;
+				this->center[0] += this->dirVec[2]*sensc;
+				this->center[2] -= this->dirVec[0]*sensc;
 				break;
 
 			case 'd':
-				this->pos[0] -= dirVec[2]*sensc;
-				this->pos[2] += dirVec[0]*sensc;
-				this->center[0] -= dirVec[2]*sensc;
-				this->center[2] += dirVec[0]*sensc;
+				this->pos[0] -= this->dirVec[2]*sensc;
+				this->pos[2] += this->dirVec[0]*sensc;
+				this->center[0] -= this->dirVec[2]*sensc;
+				this->center[2] += this->dirVec[0]*sensc;
 				break;
 
 			case ' ':
@@ -181,14 +180,15 @@ class Camera{
 	}
 
 	void calcDir(){
-		normalize((center[0] - pos[0]), (center[1] - pos[1]), (center[2] - pos[2]), this->dirVec);
+		normalize((center[0] - pos[0]), 0, (center[2] - pos[2]), this->dirVec);
+		printf("%f, %f, %f\n", this->dirVec[0], this->dirVec[1], this->dirVec[2]);
 	}
 
 	void ortVec(std::vector<GLfloat> vec1, std::vector<GLfloat> vec2, std::vector<GLfloat> &retVec){
 		retVec.clear();
-		retVec.push_back(vec1[1]*vec1[2] - vec1[2]*vec1[1]);
-		retVec.push_back(vec1[2]*vec1[0] - vec1[0]*vec1[2]);
-		retVec.push_back(vec1[0]*vec1[1] - vec1[1]*vec1[0]);
+		retVec.push_back(vec1[1]*vec2[2] - vec1[2]*vec2[1]);
+		retVec.push_back(vec1[2]*vec2[0] - vec1[0]*vec2[2]);
+		retVec.push_back(vec1[0]*vec2[1] - vec1[1]*vec2[0]);
 	}
 
 	void normalize(GLfloat x, GLfloat y, GLfloat z, std::vector<GLfloat> &retVec){
