@@ -1,12 +1,14 @@
 cmake_minimum_required(VERSION 3.5)
 
 # Project Name
-PROJECT(bruhEngine)
+PROJECT(Engine)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 add_executable(${PROJECT_NAME} main.cpp)
 
+
+# OpenGL Inclusion
 find_package(OpenGL REQUIRED)
 include_directories(${OpenGL_INCLUDE_DIRS})
 link_directories(${OpenGL_LIBRARY_DIRS})
@@ -18,30 +20,37 @@ endif(NOT OPENGL_FOUND)
 
 
 
+############ Include de Headers e libraries #################
+
+#setup do Toolkits folder
 message(STATUS "Toolkits_DIR set to: " ${TOOLKITS_FOLDER})
 set(TOOLKITS_FOLDER "" CACHE PATH "Path to Toolkits folder")
 
+#setup do XML folder
 message(STATUS "TinyXml2_DIR set to: " ${TINYXML2_FOLDER})
 set(TINYXML2_FOLDER "" CACHE PATH "Path to TinyXml2 folder")
 
+# verificar a existência dos files necessários
+# Glut
 if (NOT EXISTS "${TOOLKITS_FOLDER}/glut/GL/glut.h" OR NOT EXISTS "${TOOLKITS_FOLDER}/glut/glut32.lib")
 	message(ERROR ": GLUT not found")
-endif (NOT EXISTS "${TOOLKITS_FOLDER}/glut/GL/glut.h" OR NOT EXISTS "${TOOLKITS_FOLDER}/glut/glut32.lib")
+endif (NOT EXISTS "${TOOLKITS_FOLDER}/glut/GL/glut.h" OR NOT EXISTS "${TOOLKITS_FOLDER}/glut/glut32.lib")	
 
+# Glew
 if (NOT EXISTS "${TOOLKITS_FOLDER}/glew/GL/glew.h" OR NOT EXISTS "${TOOLKITS_FOLDER}/glew/glew32.lib")
 	message(ERROR ": GLEW not found")
 endif (NOT EXISTS "${TOOLKITS_FOLDER}/glew/GL/glew.h" OR NOT EXISTS "${TOOLKITS_FOLDER}/glew/glew32.lib")	
 
+# TinyXml2
 if (NOT EXISTS "${TINYXML2_FOLDER}/tinyxml2.h" OR NOT EXISTS "${TINYXML2_FOLDER}/tinyxml2.cpp")
 	message(ERROR ": TinyXml2 not found")
 endif (NOT EXISTS "${TINYXML2_FOLDER}/tinyxml2.h" OR NOT EXISTS "${TINYXML2_FOLDER}/tinyxml2.cpp")	
 
-include_directories(${TOOLKITS_FOLDER}/glut ${TOOLKITS_FOLDER}/glew)
+
+include_directories(${TOOLKITS_FOLDER}/glut ${TOOLKITS_FOLDER}/glew ${TINYXML2_FOLDER})
 target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} 
 									  ${TOOLKITS_FOLDER}/glut/glut32.lib 
 									  ${TOOLKITS_FOLDER}/glew/glew32.lib )
-
-include_directories(${TINYXML2_FOLDER} )
 
 if (EXISTS "${TOOLKITS_FOLDER}/glut/glut32.dll"  AND EXISTS "${TOOLKITS_FOLDER}/glew/glew32.dll")
 	file(COPY ${TOOLKITS_FOLDER}/glut/glut32.dll DESTINATION ${CMAKE_BINARY_DIR})
@@ -49,12 +58,3 @@ if (EXISTS "${TOOLKITS_FOLDER}/glut/glut32.dll"  AND EXISTS "${TOOLKITS_FOLDER}/
 endif(EXISTS "${TOOLKITS_FOLDER}/glut/glut32.dll"  AND EXISTS "${TOOLKITS_FOLDER}/glew/glew32.dll")	
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
-
-
-
-
-
-
-
-
-
