@@ -47,14 +47,14 @@ class Mesh{
 				for (int h = 0; h < cols; h++){
 					int p = (h+1)%(cols);
 
-					if ((planar[i][h]*planar[i-1][h]*planar[i-1][p]) > 0   &&  (planar[i][h] != planar[i-1][h]) && (planar[i][h] != planar[i-1][p]) && (planar[i-1][h]!= planar[i-1][p])){
+					if ((planar[i][h] > 0 && planar[i-1][h]> 0 && planar[i-1][p]> 0)    &&  (planar[i][h] != planar[i-1][h]) && (planar[i][h] != planar[i-1][p]) && (planar[i-1][h]!= planar[i-1][p])){
 						faces.push_back(planar[i][h]);
 						faces.push_back(planar[i-1][h]);
 						faces.push_back(planar[i-1][p]);
 						t++;
 					}
 					
-					if ((planar[i][h]*planar[i-1][p]*planar[i][p]) > 0  &&  (planar[i][h] != planar[i-1][p]) && (planar[i][h] != planar[i][p]) && (planar[i-1][p]!= planar[i][p])){
+					if ((planar[i][h] > 0 && planar[i-1][p] > 0 && planar[i][p] > 0)   &&  (planar[i][h] != planar[i-1][p]) && (planar[i][h] != planar[i][p]) && (planar[i-1][p]!= planar[i][p])){
 						faces.push_back(planar[i][h]);
 						faces.push_back(planar[i-1][p]);
 						faces.push_back(planar[i][p]);
