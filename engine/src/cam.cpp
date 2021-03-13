@@ -181,7 +181,6 @@ class Camera{
 
 	void calcDir(){
 		normalize((center[0] - pos[0]), 0, (center[2] - pos[2]), this->dirVec);
-		printf("%f, %f, %f\n", this->dirVec[0], this->dirVec[1], this->dirVec[2]);
 	}
 
 	void ortVec(std::vector<GLfloat> vec1, std::vector<GLfloat> vec2, std::vector<GLfloat> &retVec){

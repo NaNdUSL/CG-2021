@@ -1,6 +1,3 @@
-#include <unistd.h>
-
-
 class Model{
 	public:
 	
@@ -11,7 +8,6 @@ class Model{
 	GLuint indices;
 
 	Model(){
-
 	}
 
 	Model(std::string fileName){
@@ -29,8 +25,7 @@ class Model{
 
 	void drawVBO(){
 		glBindBuffer(GL_ARRAY_BUFFER,vertex);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexPointer(3, GL_FLOAT, 0, 0);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices);
 		glDrawElements(GL_TRIANGLES, indexNumber, GL_UNSIGNED_INT, 0);

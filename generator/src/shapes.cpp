@@ -142,7 +142,6 @@ class Sphere : public Mesh{
 				}
 				(this->planar).push_back(row);
 			}
-
         }	
 };
 

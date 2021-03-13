@@ -133,10 +133,6 @@ void renderScene(void) {
 	if (oAxisDr) axis();
 	if (ccAxisDr) ccAxis();
 
-	
-	
-
-
 	// Draw Scene
 	glColor3f(0.5f,0.5f,0.5f);
 	drawModelsVBO();
@@ -250,7 +246,6 @@ int main(int argc,  char **argv) {
 	}
 
 	// init GLUT and the window
-	glEnableClientState(GL_VERTEX_ARRAY);
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH|GLUT_DOUBLE|GLUT_RGBA);
 	glutInitWindowPosition(100,100);
@@ -271,6 +266,7 @@ int main(int argc,  char **argv) {
 
 	// Start Glew and read Models for memory and VBO
 	glewInit();
+	glEnableClientState(GL_VERTEX_ARRAY);
 	for(std::string fileName : listXML){
 		models.push_back(Model(fileName));
 	}
