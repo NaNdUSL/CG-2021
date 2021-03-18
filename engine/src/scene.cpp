@@ -85,36 +85,12 @@ class Scene{
 			}
 		}
 
-		
 
-
-		// RenderScene
-		void render(void){
-			// - Scene Runtime options
-			glClearColor(0.2f,0.2f,0.3f,0.2f);
-			glPolygonMode(GL_FRONT_AND_BACK, polyMode);
-		
-
-			// clear buffers
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			glLoadIdentity();
-
-
-			// places the camera on the scene and draw Axis
-			cam.place();
-			if (oAxisDr) axis();
-			if (ccAxisDr) ccAxis();
-
-			// Draw Scene
-			glColor3f(0.5f,0.5f,0.5f);
-			drawModelsVBO();
-
-			// End of frame
-			glutSwapBuffers();
+		void drawGroups(){
+			for (Group g: groups){
+				g.makeGroup();
+			}
 		}
-
-
-
 
 		// - Leitura do ficheiro XML passado como argumento na Engine
 		int readXML(const char* xmlName, std::vector<std::string> &listXML){
@@ -146,6 +122,74 @@ class Scene{
 			
 			return 0;
 		}
+};
 
 
+class XMLParser{
+public:
+	std::vector<Group> groups;
+	std::map<std::string,Model> modelTable;
+	std::string fileName;
+	XMLDocument doc;
+
+	XMLParser(std::string fileName, std::vector<Group> &groups){
+		this->fileName = fileName;
+		this->groups = groups;
+	}
+
+	int openXML(){
+		(this->doc).LoadFile(this->fileName);
+		return doc.ErrorID();
+	}
+
+	void parse(){
+		XMLElement* iterator;
+		for(iterator = doc.FirstChildElement()->FirstChildElement(); iterator != NULL; iterator = iterator->NextSiblingElement()){
+			std::string tagName(iterator->Value());
+			if (!tagName.compare("group")){
+				parseGroup(iterator);
+			}
+		}
+	}
+
+	void parseGroup(std::vector<Group> &gps, XMLElement* base){
+		Group g;
+		gps.push_back(g);
+
+		XMLElement* iterator;
+		for(iterator = base->FirstChildElement(); iterator != NULL; iterator = iterator->NextSiblingElement()){
+			std::string tagName(iterator->Value());
+			if (!tagName.compare("translate")){
+				printf("BRUH1\n");
+			}
+
+			else if (!tagName.compare("rotate")){
+				printf("BRUH2\n");
+			}
+
+			else if (!tagName.compare("scale")){
+				printf("BRUH3\n");
+			}
+			
+			else if (!tagName.compare("models")){
+				parseModel(g,iterator);
+			}
+
+			else if (!tagName.compare("group")){
+				parseGroup(g.child,iterator);
+			}
+		}
+	}
+
+	void parseModel(Group &parent,XMLElement* base){
+		XMLElement* iterator;
+		for(iterator = base->FirstChildElement(); iterator != NULL; iterator = iterator->NextSiblingElement()){
+			std::string fileName(iterator->Attribute("file"));
+			
+			if ( modelTable.find(fileName) == modelTable.end()){
+				modelTable[fileName] = Model(fileName);
+			}
+			parent.models.push_back(modelTable[fileName]);
+		}
+	}
 };

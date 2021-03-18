@@ -75,6 +75,12 @@ class Model{
 };
 
 
+
+
+
+
+/* ---------------------------------------------------------------------------------------------------*/
+
 class Group{
 	public:
 		std::vector<Transform> trans;
@@ -103,6 +109,13 @@ class Group{
 			glPopMatrix();
 		}
 };
+
+
+
+
+
+
+/* ---------------------------------------------------------------------------------------------------*/
 
 
 
@@ -149,7 +162,7 @@ class Scale : public Transform{
 		}
 
 		void applyTransform(){
-			glSclalef(axis[0],axis[1],axis[2]);
+			glScalef(axis[0],axis[1],axis[2]);
 		}
 	
 };

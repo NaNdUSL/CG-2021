@@ -77,6 +77,34 @@ void keyInput(unsigned char key, int x, int y){
 
 
 
+
+
+// RenderScene
+void render(void){
+	// - Scene Runtime options
+	glClearColor(0.2f,0.2f,0.3f,0.2f);
+	glPolygonMode(GL_FRONT_AND_BACK, scene.polyMode);
+
+
+	// clear buffers
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glLoadIdentity();
+
+
+	// places the camera on the scene and draw Axis
+	scene.cam.place();
+	if (scene.oAxisDr) scene.axis();
+	if (scene.ccAxisDr) scene.ccAxis();
+
+	// Draw Scene
+	glColor3f(0.5f,0.5f,0.5f);
+	scene.drawGroups();
+
+
+	// End of frame
+	glutSwapBuffers();
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
