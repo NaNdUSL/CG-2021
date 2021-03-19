@@ -24,11 +24,12 @@ using namespace tinyxml2;
 #include "cam.cpp"
 #include "model.cpp"
 #include "groupClasses.cpp"
-#include "xmlParser.cpp"
 #include "scene.cpp"
+#include "xmlParser.cpp"
+
 
 // Main Scene
-Scene scene;
+Scene* scene = new Scene();
 
 
 void changeSize(int w, int h);
@@ -67,16 +68,16 @@ void changeSize(int w, int h) {
 
 // - callBack Registers
 void detectMouseButs(int button, int state, int x, int y){
-	scene.cam.detectCamMouse(button,state,x,y);
+	scene->cam.detectCamMouse(button,state,x,y);
 }
 
 void control(int x, int y){
-	scene.cam.controlCamera(x,y);
+	scene->cam.controlCamera(x,y);
 }
 
 void keyInput(unsigned char key, int x, int y){
-	scene.cam.detectKeyboard(key,x,y);// this reservers the keys "W A S D C [space] R"
-	scene.keyboardOpts(key,x,y); // this reserves " M O I"
+	scene->cam.detectKeyboard(key,x,y);// this reservers the keys "W A S D C [space] R"
+	scene->keyboardOpts(key,x,y); // this reserves " M O I"
 }
 
 
@@ -86,8 +87,8 @@ void keyInput(unsigned char key, int x, int y){
 // RenderScene
 void renderScene(void){
 	// - Scene Runtime options
-	scene.setBackColor();
-	glPolygonMode(GL_FRONT_AND_BACK, scene.polyMode);
+	scene->setBackColor();
+	glPolygonMode(GL_FRONT_AND_BACK, scene->polyMode);
 
 
 	// clear buffers
@@ -96,13 +97,12 @@ void renderScene(void){
 
 
 	// places the camera on the scene and draw Axis
-	scene.cam.place();
-	if (scene.oAxisDr) scene.axis();
-	if (scene.ccAxisDr) scene.ccAxis();
+	scene->cam.place();
+	if (scene->oAxisDr) scene->axis();
+	if (scene->ccAxisDr) scene->ccAxis();
 
 	// Draw Scene
-	scene.setDeafultMeshColor();
-	scene.drawGroups();
+	scene->drawGroups();
 
 
 	// End of frame
@@ -118,9 +118,9 @@ int main(int argc,  char **argv) {
 		return 2;
 	}
 
-	scene = Scene(std::string(argv[1]));
+	XMLParser parser (std::string(argv[1]),scene);
 
-	int y = scene.checkFile();
+	int y = parser.openXML();
 	if (y){
 		printf("ERROR ON XML FILE READ, error code: %d\n", y);
 		return y;
@@ -150,7 +150,7 @@ int main(int argc,  char **argv) {
 	// Start Glew and read Models for memory and VBO
 	glewInit();
 	glEnableClientState(GL_VERTEX_ARRAY);
-	scene.load();
+	parser.parse();
 
 
 	//  OpenGL settings

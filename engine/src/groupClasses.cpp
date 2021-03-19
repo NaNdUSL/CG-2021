@@ -6,7 +6,7 @@ class Transform{
 			this->axis.assign(vals.begin(),vals.end());
 		}
 
-		virtual void applyTransform()=0;
+		virtual void applyTransform() = 0;
 };
 
 
@@ -51,9 +51,10 @@ class Scale : public Transform{
 class Group{
 	public:
 		std::vector<Transform*> trans;
-		std::vector<Model*> models;
+		std::vector<std::pair<std::vector<float>,Model*>> models;
 		std::vector<Group> child;
 		int flagTRI = 0;
+
 	
 		void applyTransforms(){
 			for (Transform*t: trans){
@@ -66,9 +67,10 @@ class Group{
 
 
 			applyTransforms();
-			for (Model* mod : models){
-				if (flagTRI) mod->drawT();
-				else mod->drawVBO();
+			for (std::pair<std::vector<float>,Model*> m: models){
+				glColor3f(m.first[0],m.first[1],m.first[2]);
+				if (flagTRI) m.second->drawT();
+				else m.second->drawVBO();
 			}
 	
 			for (Group grp: child){

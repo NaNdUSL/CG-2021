@@ -1,7 +1,5 @@
 class Scene{
 	public:
-		//SceneFile
-		XMLParser* sceneFile;
 
 		// camera Object
 		Camera cam;
@@ -18,21 +16,9 @@ class Scene{
 		// cameraCenter Axis
 		int ccAxisDr = 0;
 
-		Scene(){
-			sceneFile = NULL;
-		}
-		
-		Scene(std::string fileName){
-			(this->sceneFile) = new XMLParser(fileName,groups,modelTable);
-		}
 
-		int checkFile(){
-			return (this->sceneFile)-> openXML();
-		}
-
-		void load(){
-			(this->sceneFile)-> parse();
-		}
+		//- Engine Starter Options
+		std::vector<float> background{0.2f,0.2f,0.3f,0.2f};
 
 
 		void drawGroups(){
@@ -42,11 +28,7 @@ class Scene{
 		}
 
 		void setBackColor(){
-			glClearColor(0.2f,0.2f,0.3f,0.2f);
-		}
-
-		void setDeafultMeshColor(){
-			glColor3f(0.5f,0.5f,0.5f);
+			glClearColor(background[0],background[1],background[2],background[3]);
 		}
 
 

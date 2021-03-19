@@ -36,6 +36,10 @@ class Camera{
 	// Constantes usadas referentes à sensibilidade, quer do mouse, quer do keyboard
 	GLdouble sensi;
 	GLdouble sensc;
+
+	// Coordenadas iniciais
+	std::vector<GLfloat> origPosVec{0.0f,0.0f,10.0f};
+	std::vector<GLfloat> origCenter{0.0f,0.0f,0.0f};
 	
 	// Coordenadas polares da câmera e do centro, respetivamente
 	std::vector<GLfloat> posVec{0.0f,0.0f,10.0f};
@@ -87,7 +91,7 @@ class Camera{
 		switch (moveState){
 			case FCR:												// Usando coordenadas polares e a constante de sensibilidade do rato calcula os novos valores do "centro"
 			this->centerVec[0] += xMove*sensi;
-			this->centerVec[1] -= yMove*sensi;
+			this->centerVec[1] += yMove*sensi;
 			if (abs(centerVec[1] + yMove*sensi) > (M_PI/2)){		// Limita o ângulo do centro entre -PI/2 e PI/2
 				this->centerVec[1] += yMove*sensi;
 			}
@@ -175,9 +179,9 @@ class Camera{
 		this->center[0] = pos[0] + centerVec[2]*cos(centerVec[1])*sin(centerVec[0]);
 		this->center[1] = pos[1] + centerVec[2]*sin(centerVec[1]);
 		this->center[2] = pos[2] + centerVec[2]*cos(centerVec[1])*cos(centerVec[0]);
-		this->posVec[0] = centerVec[0];
-		this->posVec[1] = centerVec[1];
-		this->posVec[2] = -1*centerVec[2];
+		this->posVec[0] = (M_PI)+centerVec[0];
+		this->posVec[1] = - centerVec[1];
+		this->posVec[2] = centerVec[2];
 	}
 
 // Converte as coordenadas polares da câmera para cartesianas
@@ -185,9 +189,9 @@ class Camera{
 		this->pos[0] = posVec[2]*cos(posVec[1])*sin(posVec[0]) + center[0];
 		this->pos[1] = posVec[2]*sin(posVec[1]) + center[1];
 		this->pos[2] = posVec[2]*cos(posVec[1])*cos(posVec[0]) + center[2];
-		this->centerVec[0] = posVec[0];
-		this->centerVec[1] = posVec[1];
-		this->centerVec[2] = -posVec[2];
+		this->centerVec[0] = (M_PI)+posVec[0];
+		this->centerVec[1] = - posVec[1];
+		this->centerVec[2] = posVec[2];
 	}
 
 // Calcula e normaliza o vetor dirVec
@@ -218,11 +222,11 @@ class Camera{
 		this->clickY = 0;
 		this->sensi = 0.01f;
 		this->sensc = 0.1f;
-		this->posVec = {0.0f,0.0f,10.0f};
+
+		this->posVec.assign(origPosVec.begin(), origPosVec.end());
 		this->centerVec = {0.0f,0.0f,-10.0f};
-		this->center = {0.0f,0.0f,0.0f};
+		this->center.assign(origCenter.begin(), origCenter.end());
 		calcDir();
-		std::vector<GLfloat> yAxis{0.0f,1.0f,0.0f};
 		calcPosP();
 	}
 

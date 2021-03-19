@@ -1,14 +1,13 @@
 class XMLParser{
 	public:
-		std::vector<Group>*groups;
-		std::map<std::string,Model*>*modelTable;
+		Scene* currentScene;
+
 		std::string fileName;
 		XMLDocument doc;
 
-		XMLParser(std::string fileName, std::vector<Group>*groups, std::map<std::string,Model*> *modelTable){
+		XMLParser(std::string fileName, Scene* scene){
 			this->fileName = fileName;
-			this->groups = groups;
-			this->modelTable = modelTable;
+			this->currentScene = scene;
 		}
 
 		int openXML(){
@@ -25,7 +24,10 @@ class XMLParser{
 			for(iterator = doc.FirstChildElement()->FirstChildElement(); iterator != NULL; iterator = iterator->NextSiblingElement()){
 				std::string tagName(iterator->Value());
 				if (!tagName.compare("group")){
-					parseGroup(groups,iterator);
+					parseGroup(currentScene->groups,iterator);
+				}
+				else if(!tagName.compare("settings")){
+					parseSettings(iterator);
 				}
 			}
 		}
@@ -63,13 +65,19 @@ class XMLParser{
 
 		void parseModel(Group &parent,XMLElement* base){
 			XMLElement* iterator;
+			std::vector<float> color;
 			for(iterator = base->FirstChildElement(); iterator != NULL; iterator = iterator->NextSiblingElement()){
+				color.clear();
 				std::string fileName(iterator->Attribute("file"));
-				
-				if ( (*modelTable).find(fileName) == (*modelTable).end()){
-					(*modelTable)[fileName] = new Model(fileName);
+				color.push_back( iterator -> FloatAttribute("R", 0.5f));
+				color.push_back( iterator -> FloatAttribute("G", 0.5f));
+				color.push_back( iterator -> FloatAttribute("B", 0.5f));
+
+
+				if ( (*(currentScene->modelTable)).find(fileName) == (*(currentScene->modelTable)).end()){
+					(*(currentScene->modelTable))[fileName] = new Model(fileName);
 				}
-				parent.models.push_back((*modelTable)[fileName]);
+				parent.models.push_back( std::pair<std::vector<float>, Model*>(color,(*(currentScene->modelTable))[fileName]));
 			}
 			
 		}
@@ -97,5 +105,42 @@ class XMLParser{
 			v.push_back(base-> FloatAttribute("Y",1));
 			v.push_back(base-> FloatAttribute("Z",1));
 			parent.trans.push_back(new Scale(v));
+		}
+
+		void parseSettings(XMLElement*base){
+			XMLElement* iterator;
+			for(iterator = base->FirstChildElement(); iterator != NULL; iterator = iterator->NextSiblingElement()){
+				std::string tagName(iterator->Value());
+				if (!tagName.compare("camera")){
+					parseCamera(iterator);
+				}
+
+				else if (!tagName.compare("background")){
+					currentScene->background[0] = iterator-> FloatAttribute("R");
+					currentScene->background[1] = iterator-> FloatAttribute("G");
+					currentScene->background[2] = iterator-> FloatAttribute("B");
+					currentScene->background[3] = iterator-> FloatAttribute("A");
+				}
+			}
+		}
+
+		void parseCamera(XMLElement*base){
+			XMLElement* iterator;
+			for(iterator = base->FirstChildElement(); iterator != NULL; iterator = iterator->NextSiblingElement()){
+				std::string tagName(iterator->Value());
+				if (!tagName.compare("center")){
+					currentScene->cam.origCenter[0] = iterator->FloatAttribute("X");
+					currentScene->cam.origCenter[1] = iterator->FloatAttribute("Y");
+					currentScene->cam.origCenter[2] = iterator->FloatAttribute("Z");
+				}
+
+				else if (!tagName.compare("position")){
+					currentScene->cam.origPosVec[0] = iterator->FloatAttribute("A");
+					currentScene->cam.origPosVec[1] = fmod((iterator->FloatAttribute("B") + M_PI/2),M_PI)-(M_PI/2);
+					currentScene->cam.origPosVec[2] = iterator->FloatAttribute("R",10.0f);
+				}
+			}
+
+			currentScene->cam.reset();
 		}
 };
