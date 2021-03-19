@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <vector>
+#include <map>
 #include <iostream>
 #include <fstream>
 #include "tinyxml2.h"
@@ -22,6 +23,8 @@ using namespace tinyxml2;
 // Source Files
 #include "cam.cpp"
 #include "model.cpp"
+#include "groupClasses.cpp"
+#include "xmlParser.cpp"
 #include "scene.cpp"
 
 // Main Scene
@@ -32,6 +35,7 @@ void changeSize(int w, int h);
 void detectMouseButs(int button, int state, int x, int y);
 void control(int x, int y);
 void keyInput(unsigned char key, int x, int y);
+void renderScene(void);
 
 
 
@@ -80,9 +84,9 @@ void keyInput(unsigned char key, int x, int y){
 
 
 // RenderScene
-void render(void){
+void renderScene(void){
 	// - Scene Runtime options
-	glClearColor(0.2f,0.2f,0.3f,0.2f);
+	scene.setBackColor();
 	glPolygonMode(GL_FRONT_AND_BACK, scene.polyMode);
 
 
@@ -97,7 +101,7 @@ void render(void){
 	if (scene.ccAxisDr) scene.ccAxis();
 
 	// Draw Scene
-	glColor3f(0.5f,0.5f,0.5f);
+	scene.setDeafultMeshColor();
 	scene.drawGroups();
 
 
@@ -109,10 +113,19 @@ void render(void){
 
 
 int main(int argc,  char **argv) {	
-	if (argc < 2 || scene.loadXML(argv[1])){ ///////////////////////////////////////////// $$
-		printf("Error on Engine Startup - Check the XML File before Starting...\n");
+	if (argc < 2){
+		printf("Error on Engine Startup - No XML File Specified...\n");
 		return 2;
 	}
+
+	scene = Scene(std::string(argv[1]));
+
+	int y = scene.checkFile();
+	if (y){
+		printf("ERROR ON XML FILE READ, error code: %d\n", y);
+		return y;
+	}
+	
 
 	// init GLUT and the window
 	glutInit(&argc, argv);
@@ -125,7 +138,7 @@ int main(int argc,  char **argv) {
 		
 	
 	// Required callback registry
-	glutDisplayFunc(scene.render);
+	glutDisplayFunc(renderScene);
 	glutReshapeFunc(changeSize);
 
 	
@@ -137,7 +150,8 @@ int main(int argc,  char **argv) {
 	// Start Glew and read Models for memory and VBO
 	glewInit();
 	glEnableClientState(GL_VERTEX_ARRAY);
-	scene.loadModels(); ///////////////////////////////////////////// $$
+	scene.load();
+
 
 	//  OpenGL settings
 	glEnable(GL_DEPTH_TEST);

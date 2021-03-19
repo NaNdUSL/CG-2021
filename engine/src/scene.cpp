@@ -1,10 +1,14 @@
 class Scene{
 	public:
+		//SceneFile
+		XMLParser* sceneFile;
+
 		// camera Object
 		Camera cam;
 		
 		// Models
 		std::vector<Group> groups;
+		std::map<std::string,Model*> modelTable;
 		
 		// - Engine Runtime Options
 		// Mode of polygon (fill / line)
@@ -14,8 +18,39 @@ class Scene{
 		// cameraCenter Axis
 		int ccAxisDr = 0;
 
+		Scene(){
+			sceneFile = NULL;
+		}
 		
+		Scene(std::string fileName){
+			(this->sceneFile) = new XMLParser(fileName,groups,modelTable);
+		}
 
+		int checkFile(){
+			return (this->sceneFile)-> openXML();
+		}
+
+		void load(){
+			(this->sceneFile)-> parse();
+			printf("%d\n",groups.size());
+		}
+
+
+		void drawGroups(){
+
+			for (Group g: groups){
+
+				g.makeGroup();
+			}
+		}
+
+		void setBackColor(){
+			glClearColor(0.2f,0.2f,0.3f,0.2f);
+		}
+
+		void setDeafultMeshColor(){
+			glColor3f(0.5f,0.5f,0.5f);
+		}
 
 
 		// Draw the axis centered on Origin
@@ -36,8 +71,6 @@ class Scene{
 			glEnd();
 		}
 		
-		
-
 
 		// Draww the axis centered on CameraCenter
 		void ccAxis(){
@@ -56,9 +89,6 @@ class Scene{
 			glVertex3f(cam.center[0], cam.center[1], cam.center[2]+0.5f);
 			glEnd();
 		}
-
-
-
 
 
 		// Receive keyboard input and applay options
@@ -84,112 +114,7 @@ class Scene{
 				break;
 			}
 		}
-
-
-		void drawGroups(){
-			for (Group g: groups){
-				g.makeGroup();
-			}
-		}
-
-		// - Leitura do ficheiro XML passado como argumento na Engine
-		int readXML(const char* xmlName, std::vector<std::string> &listXML){
-			//Variável XMLDocument armazena o ficheiro XML estruturadamente
-			XMLDocument doc;
-			doc.LoadFile(xmlName);
-		
-			//Verifica se ocorreu algum erro durante o loading do ficheiro
-			// 0- bem sucedido
-			// 3- ficheiro não encontrado
-			// 7- erro no XML
-			int y = doc.ErrorID();
-			if(y != 0){
-				printf("ERROR ON XML FILE READ, error code: %d\n", y);
-				return y;
-			}
-		
-			//O método FirstChildElement procura um elemento com o nome especificado e "entra" nesse elemento (altera o nível de profundidade)
-			// da travessia. Neste caso executamos o método 2 vezes pq temos <scene> -> <model>
-			//XMLElement* nomeFile = doc.FirstChildElement()->FirstChildElement();
-		
-			//Vamos buscar o valor do atributo file para obtermos o nome do ficheiro
-			//const char* str = nomeFile->Attribute("file");
-			XMLElement* iterator;
-			for(iterator = doc.FirstChildElement()->FirstChildElement(); iterator != NULL; iterator = iterator->NextSiblingElement()){
-				const char* file_name = iterator->Attribute("file");
-				listXML.push_back(std::string(file_name));
-			}
-			
-			return 0;
-		}
 };
 
 
-class XMLParser{
-public:
-	std::vector<Group> groups;
-	std::map<std::string,Model> modelTable;
-	std::string fileName;
-	XMLDocument doc;
 
-	XMLParser(std::string fileName, std::vector<Group> &groups){
-		this->fileName = fileName;
-		this->groups = groups;
-	}
-
-	int openXML(){
-		(this->doc).LoadFile(this->fileName);
-		return doc.ErrorID();
-	}
-
-	void parse(){
-		XMLElement* iterator;
-		for(iterator = doc.FirstChildElement()->FirstChildElement(); iterator != NULL; iterator = iterator->NextSiblingElement()){
-			std::string tagName(iterator->Value());
-			if (!tagName.compare("group")){
-				parseGroup(iterator);
-			}
-		}
-	}
-
-	void parseGroup(std::vector<Group> &gps, XMLElement* base){
-		Group g;
-		gps.push_back(g);
-
-		XMLElement* iterator;
-		for(iterator = base->FirstChildElement(); iterator != NULL; iterator = iterator->NextSiblingElement()){
-			std::string tagName(iterator->Value());
-			if (!tagName.compare("translate")){
-				printf("BRUH1\n");
-			}
-
-			else if (!tagName.compare("rotate")){
-				printf("BRUH2\n");
-			}
-
-			else if (!tagName.compare("scale")){
-				printf("BRUH3\n");
-			}
-			
-			else if (!tagName.compare("models")){
-				parseModel(g,iterator);
-			}
-
-			else if (!tagName.compare("group")){
-				parseGroup(g.child,iterator);
-			}
-		}
-	}
-
-	void parseModel(Group &parent,XMLElement* base){
-		XMLElement* iterator;
-		for(iterator = base->FirstChildElement(); iterator != NULL; iterator = iterator->NextSiblingElement()){
-			std::string fileName(iterator->Attribute("file"));
-			
-			if ( modelTable.find(fileName) == modelTable.end()){
-				modelTable[fileName] = Model(fileName);
-			}
-			parent.models.push_back(modelTable[fileName]);
-		}
-	}
-};
