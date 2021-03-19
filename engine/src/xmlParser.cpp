@@ -1,11 +1,11 @@
 class XMLParser{
 	public:
-		std::vector<Group> groups;
-		std::map<std::string,Model*> modelTable;
+		std::vector<Group>*groups;
+		std::map<std::string,Model*>*modelTable;
 		std::string fileName;
 		XMLDocument doc;
 
-		XMLParser(std::string fileName, std::vector<Group> &groups, std::map<std::string,Model*> &modelTable){
+		XMLParser(std::string fileName, std::vector<Group>*groups, std::map<std::string,Model*> *modelTable){
 			this->fileName = fileName;
 			this->groups = groups;
 			this->modelTable = modelTable;
@@ -28,11 +28,9 @@ class XMLParser{
 					parseGroup(groups,iterator);
 				}
 			}
-
-			printf("%d\n",groups.size() );
 		}
 
-		void parseGroup(std::vector<Group> &gps, XMLElement* base){
+		void parseGroup(std::vector<Group>*gps, XMLElement* base){
 			Group g;
 
 			XMLElement* iterator;
@@ -47,7 +45,7 @@ class XMLParser{
 				}
 
 				else if (!tagName.compare("scale")){
-					parseRotate(g,iterator);
+					parseScale(g,iterator);
 				}
 				
 				else if (!tagName.compare("models")){
@@ -55,11 +53,11 @@ class XMLParser{
 				}
 
 				else if (!tagName.compare("group")){
-					parseGroup(g.child,iterator);
+					parseGroup(&(g.child),iterator);
 				}
 			}
 
-			gps.push_back(g);
+			(*gps).push_back(g);
 		}
 
 
@@ -68,12 +66,10 @@ class XMLParser{
 			for(iterator = base->FirstChildElement(); iterator != NULL; iterator = iterator->NextSiblingElement()){
 				std::string fileName(iterator->Attribute("file"));
 				
-				if ( modelTable.find(fileName) == modelTable.end()){
-					modelTable[fileName] = NULL;
-					modelTable[fileName] = new Model(fileName);
-					
+				if ( (*modelTable).find(fileName) == (*modelTable).end()){
+					(*modelTable)[fileName] = new Model(fileName);
 				}
-				parent.models.push_back(modelTable[fileName]);
+				parent.models.push_back((*modelTable)[fileName]);
 			}
 			
 		}
@@ -97,9 +93,9 @@ class XMLParser{
 
 		void parseScale(Group &parent,XMLElement* base){
 			std::vector<float> v;
-			v.push_back(base-> FloatAttribute("X"));
-			v.push_back(base-> FloatAttribute("Y"));
-			v.push_back(base-> FloatAttribute("Z"));
+			v.push_back(base-> FloatAttribute("X",1));
+			v.push_back(base-> FloatAttribute("Y",1));
+			v.push_back(base-> FloatAttribute("Z",1));
 			parent.trans.push_back(new Scale(v));
 		}
 };

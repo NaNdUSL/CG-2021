@@ -64,8 +64,9 @@ class Group{
 		void makeGroup(){
 			glPushMatrix();
 
-			for (Model* mod : models){
 
+			applyTransforms();
+			for (Model* mod : models){
 				if (flagTRI) mod->drawT();
 				else mod->drawVBO();
 			}

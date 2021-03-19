@@ -7,8 +7,8 @@ class Scene{
 		Camera cam;
 		
 		// Models
-		std::vector<Group> groups;
-		std::map<std::string,Model*> modelTable;
+		std::vector<Group>*groups = new std::vector<Group>() ;
+		std::map<std::string,Model*>*modelTable = new std::map<std::string,Model*>();
 		
 		// - Engine Runtime Options
 		// Mode of polygon (fill / line)
@@ -32,14 +32,11 @@ class Scene{
 
 		void load(){
 			(this->sceneFile)-> parse();
-			printf("%d\n",groups.size());
 		}
 
 
 		void drawGroups(){
-
-			for (Group g: groups){
-
+			for (Group g: (*groups)){
 				g.makeGroup();
 			}
 		}
