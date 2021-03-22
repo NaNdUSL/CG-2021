@@ -1,5 +1,11 @@
 class Scene{
 	public:
+		std::string name = std::string("Engine Scene - ");
+
+		// Time based variables
+		int lastRefresh = glutGet(GLUT_ELAPSED_TIME);
+		float frames = 0;
+
 
 		// camera Object
 		Camera cam;
@@ -29,6 +35,19 @@ class Scene{
 
 		void setBackColor(){
 			glClearColor(background[0],background[1],background[2],background[3]);
+		}
+
+		
+		float getFPS(){
+			float fps = -1;
+			frames ++;
+			int time = glutGet(GLUT_ELAPSED_TIME);
+			if ((time-lastRefresh)>1000){
+				fps = ((frames*1000)/(time-lastRefresh));
+				lastRefresh = time;
+				frames = 0;
+			}
+			return fps;
 		}
 
 

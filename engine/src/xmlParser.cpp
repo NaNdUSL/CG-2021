@@ -8,6 +8,7 @@ class XMLParser{
 		XMLParser(std::string fileName, Scene* scene){
 			this->fileName = fileName;
 			this->currentScene = scene;
+			this->currentScene->name += fileName;
 		}
 
 		int openXML(){
@@ -19,22 +20,24 @@ class XMLParser{
 			return doc.ErrorID();
 		}
 
-		void parse(){
+		void parse(){ // Retorna o número de triângulos lidos na cena
 			XMLElement* iterator;
+			int tris = 0;
 			for(iterator = doc.FirstChildElement()->FirstChildElement(); iterator != NULL; iterator = iterator->NextSiblingElement()){
 				std::string tagName(iterator->Value());
 				if (!tagName.compare("group")){
-					parseGroup(currentScene->groups,iterator);
+					tris += parseGroup(currentScene->groups,iterator);
 				}
 				else if(!tagName.compare("settings")){
 					parseSettings(iterator);
 				}
 			}
+			this->currentScene->name += " | Tris: " + std::to_string(tris);
 		}
 
-		void parseGroup(std::vector<Group>*gps, XMLElement* base){
+		int parseGroup(std::vector<Group>*gps, XMLElement* base){// Retorna o número de triângulos lidos no grupo
 			Group g;
-
+			int tris = 0;
 			XMLElement* iterator;
 			for(iterator = base->FirstChildElement(); iterator != NULL; iterator = iterator->NextSiblingElement()){
 				std::string tagName(iterator->Value());
@@ -51,20 +54,22 @@ class XMLParser{
 				}
 				
 				else if (!tagName.compare("models")){
-					parseModel(g,iterator);
+					tris += parseModel(g,iterator);
 				}
 
 				else if (!tagName.compare("group")){
-					parseGroup(&(g.child),iterator);
+					tris += parseGroup(&(g.child),iterator);
 				}
 			}
 
 			(*gps).push_back(g);
+			return tris;
 		}
 
 
-		void parseModel(Group &parent,XMLElement* base){
+		int parseModel(Group &parent,XMLElement* base){
 			XMLElement* iterator;
+			int tris = 0;
 			std::vector<float> color;
 			for(iterator = base->FirstChildElement(); iterator != NULL; iterator = iterator->NextSiblingElement()){
 				color.clear();
@@ -77,9 +82,10 @@ class XMLParser{
 				if ( (*(currentScene->modelTable)).find(fileName) == (*(currentScene->modelTable)).end()){
 					(*(currentScene->modelTable))[fileName] = new Model(fileName);
 				}
+				tris += (int)((*(currentScene->modelTable))[fileName])->facesList.size();
 				parent.models.push_back( std::pair<std::vector<float>, Model*>(color,(*(currentScene->modelTable))[fileName]));
 			}
-			
+			return tris;
 		}
 
 

@@ -91,6 +91,7 @@ void renderScene(void){
 	glPolygonMode(GL_FRONT_AND_BACK, scene->polyMode);
 
 
+
 	// clear buffers
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
@@ -102,6 +103,8 @@ void renderScene(void){
 	if (scene->ccAxisDr) scene->ccAxis();
 
 	// Draw Scene
+	float fps = scene->getFPS();
+	if (!(fps < 0)) glutSetWindowTitle(((scene->name) + " - FPS: " + std::to_string(fps)).c_str());
 	scene->drawGroups();
 
 
@@ -133,12 +136,12 @@ int main(int argc,  char **argv) {
 	glutInitWindowPosition(100,100);
 	glutInitWindowSize(800,800);
 	
-	std::string name = std::string("Engine Scene - ") + argv[1];
-	glutCreateWindow(name.c_str());
+	glutCreateWindow((scene->name).c_str());
 		
 	
 	// Required callback registry
 	glutDisplayFunc(renderScene);
+	glutIdleFunc(renderScene); // FPS COUNTER
 	glutReshapeFunc(changeSize);
 
 	
