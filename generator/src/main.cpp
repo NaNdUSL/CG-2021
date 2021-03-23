@@ -14,7 +14,6 @@
 
 
 int checkArgs(int nFloats, int nInts, std::vector<float> &fls, std::vector<int> &ins, int argc, char const *argv[]){
-	int r = 0;
 	float argF;
 	int argI;
 	if (argc < (nFloats+nInts+3)) return 0;

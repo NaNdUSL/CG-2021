@@ -68,7 +68,7 @@ class Mesh{
 
 
 		// - Método para escrita dos vértices e índices de vértices em ficheiro
-		int write3DFile(){
+		void write3DFile(){
 			std::ofstream File2Wr;
 			File2Wr.open(this->fileName);
 			File2Wr << vex << "\n" << facs <<"\n";
