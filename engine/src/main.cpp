@@ -11,6 +11,8 @@
 #include <unistd.h>
 #include <vector>
 #include <map>
+#include <algorithm>
+#include <string>
 #include <iostream>
 #include <fstream>
 #include "tinyxml2.h"

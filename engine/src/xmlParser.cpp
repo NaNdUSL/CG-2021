@@ -149,4 +149,8 @@ class XMLParser{
 
 			currentScene->cam.reset();
 		}
+
+		void parseAtt(XMLElement*base,const char* name,float default){
+			
+		}
 };
