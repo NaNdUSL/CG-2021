@@ -1,0 +1,170 @@
+<scene>
+	<pi tgt="pi"/>
+	
+	<!-- dentro das settings não são aceitas atribuições ou flow conditionals, apenas leitura de variáveis -->
+	<settings>
+		<camera>
+			<center X="0" Y="0" Z="0"/>
+			<position A="3*pi/4" B="pi/6" R="400"/>
+		</camera>
+		<background R="0.2" G="0.3" B="0.6" A="0.4"/>
+	</settings>
+
+	<!-- Trees -->	
+	<set tgt="radiusTree" exp="90" />
+	<set tgt="treeNum" exp="300" />
+	<while exp="treeNum > 0">
+		<rand tgt="ztrs"/>
+		<rand tgt="xtrs"/>
+		<set tgt="ztrs" exp= "(ztrs*370)-185"/>
+		<set tgt="xtrs" exp= "(xtrs*370)-185"/>
+		<set tgt="dist" exp="(xtrs*xtrs) + (ztrs*ztrs)" />
+		<if exp= "dist > (radiusTree*radiusTree)">
+			<then>
+				<set tgt= "treeNum" exp="treeNum-1" />
+				<group>
+					<translate X="xtrs" Z="ztrs"/>
+					<set tgt="scl" exp="0.08"/>
+					<scale  X="scl" Y="scl" Z="scl" />
+					<set tgt="minRads" exp="5"/>
+					<rand tgt="zscl"/>
+
+					<group>
+						<translate Y="60"/>
+						<scale Y="25" Z="(minRads*zscl)+minRads" X="(minRads*zscl)+minRads"/>
+						<models>
+							<model file="cyl.3d" R="0.6" G="0.4" B="0.05"/>
+						</models>
+					</group>
+
+					<set tgt="minHgt" exp="40"/>
+					<set tgt="minRads" exp="20"/>
+					<rand tgt="yscl" />
+
+					<group>
+						<translate Y="((minHgt*yscl)+minHgt)/(2*scl)"/>
+						<scale Y="(minHgt*yscl)+minHgt" Z="(minRads*zscl)+minRads" X="(minRads*zscl)+minRads"/>
+						<models>
+							<model file="cone.3d" R="0" G="(zscl+yscl)/4 + 0.4" B="0"/>
+						</models>
+					</group>
+				</group>
+			</then>
+		</if>
+	</while>
+
+	<!-- penis -->
+	<group>
+		<scale X="0.7" Y="0.7" Z="0.7" />
+		<group>
+			<translate Y="16"/>
+			<scale X="0.54" Y="6" Z="0.55" />
+			<models>
+				<model file="cyl.3d" R="0.02" G="0.654" B="0.583"/>
+			</models>
+		</group>
+
+		<group>
+			<translate Y="30"/>
+			<scale X="0.51" Y="0.7" Z="0.52" />
+			<models>
+				<model file="sphere.3d" R="0.65" G="0.4" B="0.8"/>
+			</models>
+		</group>
+		
+		<group>
+			<translate Y="3" X="8"/>
+			<scale X="0.3+0.45" Y="0.3+0.47" Z="0.3+0.5" />
+			<models>
+				<model file="sphere.3d" R="0.02" G="0.76" B="0.68"/>
+			</models>
+		</group>
+		
+		<group>
+			<translate Y="3" Z="7.5"/>
+			<scale X="0.3+0.35" Y="0.3+0.4" Z="0.3+0.5" />
+			<models>
+				<model file="sphere.3d" R="0.02" G="0.76" B="0.68"/>
+			</models>
+		</group>
+	</group> 
+
+	
+	<!-- cowballs -->
+	<group>
+		<set tgt="balls" exp="12"/>
+		
+		<set tgt="angRate" exp="360/balls"/>
+		<translate Y="2"/>
+		<scale X="0.4" Y="0.4" Z="0.4" />
+
+		
+		<while exp="balls > 0">
+			<group>
+				<rotate angle="angRate*balls" axisY="1" axisX="0" axisZ="0" />
+				<translate X="50"/>
+				<models>
+					<model file="sphere.3d" R="0.06" G="0.06" B="0.68"/>
+				</models>
+			</group>
+			<set tgt="balls" exp="balls-1"/>
+		</while>
+	</group>
+
+	
+	<!-- escravos coloniais -->
+	<group>
+		<set tgt="balls" exp="20"/>
+		<set tgt="angRate" exp="360/balls"/>
+		<translate Y="4"/>
+		<scale X="0.6" Y="0.6" Z="0.6" />
+		<while exp="balls > 0">
+			<group>
+				<rotate angle="angRate*balls" axisY="1" axisX="0" axisZ="0" />
+				<translate X="120"/>
+				<models>
+					<model file="sphere.3d" R="0.6" G="0.06" B="0.1"/>
+				</models>
+			</group>
+			<set tgt="balls" exp="balls-1"/>
+		</while>
+	</group>
+
+
+
+	<!-- Plane -->
+	<group>
+		<scale X="10" Y="10" Z="10" />
+		<models>
+			<model file="plane.3d" R="0" G="0.5" B="0.2"/>
+		</models>
+	</group>
+</scene>
+
+
+
+
+<!-- arvere	<group>
+		<set tgt="scl" exp="0.09"/>
+		<scale  X="scl" Y="scl" Z="scl" />
+		<set tgt="minRads" exp="5"/>
+		<rand tgt="zscl"/>
+		<group>
+			<translate Y="70"/>
+			<scale Y="25" Z="(minRads*zscl)+minRads" X="(minRads*zscl)+minRads"/>
+			<models>
+				<model file="cyl.3d" R="0.6" G="0.4" B="0.05"/>
+			</models>
+		</group>
+
+		<set tgt="minHgt" exp="50"/>
+		<set tgt="minRads" exp="30"/>
+		<rand tgt="yscl"/>
+		<group>
+			<translate Y="350"/>
+			<scale Y="(minHgt*yscl)+minHgt" Z="(minRads*zscl)+minRads" X="(minRads*zscl)+minRads"/>
+			<models>
+				<model file="cone.3d" R="0" G="0.4" B="0"/>
+			</models>
+		</group>
+	</group> -->

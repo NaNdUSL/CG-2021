@@ -7,26 +7,32 @@
 		<background R="0.2" G="0.3" B="0.6" A="0.4"/>
 	</settings>
 	
-	<set tgt="pos" exp="1000"/>
+	<set tgt="pos" exp="100"/>
 	<set tgt="radius" exp="30"/>
 	<!-- radius = 30 -->
 	<pi tgt="rat"/>
 	<set tgt="rat" exp="(2*rat)/pos" />
 	<set tgt="clrrat" exp="1/pos" />
-
-	<while exp="pos > 0">		
-		<set tgt="alfa" exp="rat*pos" />
-		<cos tgt="x" exp="alfa" />
-		<sin tgt="z" exp="alfa" />
-		<set tgt="x" exp="radius*x" />
-		<set tgt="z" exp="radius*z" />
-		<group>
-			<translate X="x" Z="z"/>
-			<scale X="0.1" Z="0.1" Y="0.1"/>
-			<models>
-				<model file="sphere.3d" R="clrrat*pos" G="clrrat*pos" B="clrrat*pos"/>
-			</models>
-		</group>
-		<set tgt="pos" exp="pos-1"/>
-	</while>
+	<group>
+		<translate X="0"/>
+		<while exp="pos > 0">		
+			<set tgt="alfa" exp="rat*pos" />
+			<cos tgt="x" exp="alfa" />
+			<sin tgt="z" exp="alfa" />
+			<set tgt="x" exp="radius*x" />
+			<set tgt="z" exp="radius*z" />			
+			<set tgt="t" exp="pos"/>
+			<while exp="t > 0">
+				<set tgt="t" exp="t-1"/>
+				<group>	
+					<translate X="x" Y="t" Z="z"/>
+					<scale X="0.1" Z="0.1" Y="0.1"/>
+					<models>
+						<model file="sphere.3d" R="1-clrrat*pos" G="1-clrrat*pos" B="clrrat*pos"/>
+					</models>	
+				</group>
+			</while>
+			<set tgt="pos" exp="pos-1"/>
+		</while>
+	</group>
 </scene>
