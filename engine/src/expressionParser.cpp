@@ -219,9 +219,7 @@ public:
 				break;
 
 				case RNDEV:
-				if (error) res = time(NULL);
-				srand((unsigned int) res);
-				res = ((float) rand())/((float) RAND_MAX);
+				res = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 				error = 0;
 				break;
 	
