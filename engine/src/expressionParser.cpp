@@ -1,19 +1,10 @@
-#include <math.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <vector>
-#include <map>
-#include <algorithm>
-#include <string>
-#include <iostream>
-#include <fstream>
-
-
 #define IDNEV 0
 #define SQTEV 1
 #define SINEV 2
 #define TANEV 3
 #define COSEV 4
+#define MPIEV 5
+#define RNDEV 6
 
 class ExprParser{
 public:
@@ -22,6 +13,14 @@ public:
 	int error = 0;
 	
 	ExprParser(std::string exp){
+		setExpr(exp);
+	}
+
+	ExprParser(){
+		setExpr("");
+	}
+
+	ExprParser(const char*exp){
 		setExpr(exp);
 	}
 
@@ -196,7 +195,7 @@ public:
 	float evalOpts(int opt=IDNEV){
 		float res = this->eval();
 		error = !(isfinite(res));
-		if (!(error))
+		if (!(error) || opt == MPIEV || opt == RNDEV)
 			switch (opt){
 				case SQTEV:
 				res = sqrt(res);
@@ -213,6 +212,18 @@ public:
 				case COSEV:
 				res = cos(res);
 				break;
+
+				case MPIEV:
+				error = 0;
+				res = M_PI;
+				break;
+
+				case RNDEV:
+				if (error) res = time(NULL);
+				srand((unsigned int) res);
+				res = ((float) rand())/((float) RAND_MAX);
+				error = 0;
+				break;
 	
 				default:
 				break;
@@ -221,11 +232,3 @@ public:
 		return res;
 	}
 };
-
-int main(int argc, char const *argv[]){
-	std::map<std::string, float>*hash = new std::map<std::string, float>();
-	ExprParser teste(std::string("10 >1 "));
-	printf("%f\n",teste.evalOpts());
-	printf("%d\n",teste.error );
-	return 0;
-}

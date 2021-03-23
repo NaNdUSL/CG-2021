@@ -3,10 +3,12 @@
 class XMLParser{
 	public:
 		Scene* currentScene;
-		ExprParser pars("");
+		ExprParser pars;
 
 		std::string fileName;
 		XMLDocument doc;
+
+		int tris = 0;
 
 		XMLParser(std::string fileName, Scene* scene){
 			this->fileName = fileName;
@@ -23,24 +25,30 @@ class XMLParser{
 			return doc.ErrorID();
 		}
 
-		void parse(){ // Retorna o número de triângulos lidos na cena
+		void parse(){
 			XMLElement* iterator;
-			int tris = 0;
-			for(iterator = doc.FirstChildElement()->FirstChildElement(); iterator != NULL; iterator = iterator->NextSiblingElement()){
-				std::string tagName(iterator->Value());
-				if (!tagName.compare("group")){
-					tris += parseGroup(currentScene->groups,iterator);
-				}
-				else if(!tagName.compare("settings")){
-					parseSettings(iterator);
-				}
-			}
+			parseFromTag(currentScene->groups,doc.FirstChildElement());
 			this->currentScene->name += " | Tris: " + std::to_string(tris);
 		}
 
-		int parseGroup(std::vector<Group>*gps, XMLElement* base){// Retorna o número de triângulos lidos no grupo
+		void parseFromTag(std::vector<Group>*gps,XMLElement* base){
+			if (base){
+				XMLElement* iterator;
+				for(iterator = base->FirstChildElement(); iterator != NULL; iterator = iterator->NextSiblingElement()){
+					std::string tagName(iterator->Value());
+					if (!tagName.compare("group")){
+						parseGroup(gps,iterator);
+					}
+					else if(!tagName.compare("settings")){
+						parseSettings(iterator);
+					}
+					else parseStatement(gps,iterator,tagName);
+				}
+			}
+		}
+
+		void parseGroup(std::vector<Group>*gps, XMLElement* base){// Retorna o número de triângulos lidos no grupo
 			Group g;
-			int tris = 0;
 			XMLElement* iterator;
 			for(iterator = base->FirstChildElement(); iterator != NULL; iterator = iterator->NextSiblingElement()){
 				std::string tagName(iterator->Value());
@@ -57,29 +65,29 @@ class XMLParser{
 				}
 				
 				else if (!tagName.compare("models")){
-					tris += parseModel(g,iterator);
+					parseModel(g,iterator);
 				}
 
 				else if (!tagName.compare("group")){
-					tris += parseGroup(&(g.child),iterator);
+					parseGroup(&(g.child),iterator);
 				}
+
+				else parseStatement(&(g.child),iterator,tagName);
 			}
 
 			(*gps).push_back(g);
-			return tris;
 		}
 
 
-		int parseModel(Group &parent,XMLElement* base){
+		void parseModel(Group &parent,XMLElement* base){
 			XMLElement* iterator;
-			int tris = 0;
 			std::vector<float> color;
 			for(iterator = base->FirstChildElement(); iterator != NULL; iterator = iterator->NextSiblingElement()){
 				color.clear();
 				std::string fileName(iterator->Attribute("file"));
-				color.push_back( iterator -> FloatAttribute("R", 0.5f));
-				color.push_back( iterator -> FloatAttribute("G", 0.5f));
-				color.push_back( iterator -> FloatAttribute("B", 0.5f));
+				color.push_back(getParsAtt(iterator,"R", 0.5f));
+				color.push_back(getParsAtt(iterator,"G", 0.5f));
+				color.push_back(getParsAtt(iterator,"B", 0.5f));
 
 
 				if ( (*(currentScene->modelTable)).find(fileName) == (*(currentScene->modelTable)).end()){
@@ -88,33 +96,36 @@ class XMLParser{
 				tris += (int)((*(currentScene->modelTable))[fileName])->facesList.size();
 				parent.models.push_back( std::pair<std::vector<float>, Model*>(color,(*(currentScene->modelTable))[fileName]));
 			}
-			return tris;
 		}
 
 
 		void parseTranslate(Group &parent,XMLElement* base){
 			std::vector<float> v;
-			v.push_back(base-> FloatAttribute("X"));
-			v.push_back(base-> FloatAttribute("Y"));
-			v.push_back(base-> FloatAttribute("Z"));
+			v.push_back(getParsAtt(base,"X"));
+			v.push_back(getParsAtt(base,"Y"));
+			v.push_back(getParsAtt(base,"Z"));
 			parent.trans.push_back(new Translate(v));
 		}
 
 		void parseRotate(Group &parent,XMLElement* base){
 			std::vector<float> v;
-			v.push_back(base-> FloatAttribute("axisX"));
-			v.push_back(base-> FloatAttribute("axisY"));
-			v.push_back(base-> FloatAttribute("axisZ"));
-			parent.trans.push_back(new Rotate(v,base->FloatAttribute("angle")));
+			v.push_back(getParsAtt(base,"axisX"));
+			v.push_back(getParsAtt(base,"axisY"));
+			v.push_back(getParsAtt(base,"axisZ"));
+			parent.trans.push_back(new Rotate(v,getParsAtt(base,"angle")));
 		}
 
 		void parseScale(Group &parent,XMLElement* base){
 			std::vector<float> v;
-			v.push_back(base-> FloatAttribute("X",1));
-			v.push_back(base-> FloatAttribute("Y",1));
-			v.push_back(base-> FloatAttribute("Z",1));
+			v.push_back(getParsAtt(base,"X",1));
+			v.push_back(getParsAtt(base,"Y",1));
+			v.push_back(getParsAtt(base,"Z",1));
 			parent.trans.push_back(new Scale(v));
 		}
+
+
+
+		// - processamento de settings da engine
 
 		void parseSettings(XMLElement*base){
 			XMLElement* iterator;
@@ -125,10 +136,10 @@ class XMLParser{
 				}
 
 				else if (!tagName.compare("background")){
-					currentScene->background[0] = iterator-> FloatAttribute("R");
-					currentScene->background[1] = iterator-> FloatAttribute("G");
-					currentScene->background[2] = iterator-> FloatAttribute("B");
-					currentScene->background[3] = iterator-> FloatAttribute("A");
+					currentScene->background[0] = getParsAtt(iterator,"R");
+					currentScene->background[1] = getParsAtt(iterator,"G");
+					currentScene->background[2] = getParsAtt(iterator,"B");
+					currentScene->background[3] = getParsAtt(iterator,"A");
 				}
 			}
 		}
@@ -138,25 +149,67 @@ class XMLParser{
 			for(iterator = base->FirstChildElement(); iterator != NULL; iterator = iterator->NextSiblingElement()){
 				std::string tagName(iterator->Value());
 				if (!tagName.compare("center")){
-					currentScene->cam.origCenter[0] = iterator->FloatAttribute("X");
-					currentScene->cam.origCenter[1] = iterator->FloatAttribute("Y");
-					currentScene->cam.origCenter[2] = iterator->FloatAttribute("Z");
+					currentScene->cam.origCenter[0] = getParsAtt(iterator,"X");
+					currentScene->cam.origCenter[1] = getParsAtt(iterator,"Y");
+					currentScene->cam.origCenter[2] = getParsAtt(iterator,"Z");
 				}
 
 				else if (!tagName.compare("position")){
-					currentScene->cam.origPosVec[0] = iterator->FloatAttribute("A");
-					currentScene->cam.origPosVec[1] = fmod((iterator->FloatAttribute("B") + M_PI/2),M_PI)-(M_PI/2);
-					currentScene->cam.origPosVec[2] = iterator->FloatAttribute("R",10.0f);
+					currentScene->cam.origPosVec[0] = getParsAtt(iterator,"A");
+					currentScene->cam.origPosVec[1] = fmod((getParsAtt(iterator,"B") + M_PI/2),M_PI)-(M_PI/2);
+					currentScene->cam.origPosVec[2] = getParsAtt(iterator,"R",10.0f);
 				}
 			}
 
 			currentScene->cam.reset();
 		}
 
+
+		// - Processamento de statements
+
+
+		void parseStatement(std::vector<Group>*gps, XMLElement*base, std::string tagName){
+			if (!tagName.compare("set")) setParsAtt(base,IDNEV);
+			else if (!tagName.compare("pi")) setParsAtt(base,MPIEV);
+			else if (!tagName.compare("rand")) setParsAtt(base,RNDEV);
+			else if (!tagName.compare("cos")) setParsAtt(base,COSEV);
+			else if (!tagName.compare("sin")) setParsAtt(base,SINEV);
+			else if (!tagName.compare("tan")) setParsAtt(base,TANEV);
+			else if (!tagName.compare("sqrt")) setParsAtt(base,SQTEV);
+
+			else parseFlowStm(gps,base,tagName);
+		}
+
+
+		void parseFlowStm(std::vector<Group>*gps, XMLElement*base, std::string tagName){
+			float cond = getParsAtt(base,"exp");
+
+			if (!tagName.compare("if")){
+				XMLElement*iterator;
+				if (cond){
+					for(iterator = base->FirstChildElement(); iterator != NULL && strcmp(iterator->Value(),"then"); iterator =  iterator->NextSiblingElement());
+				}
+				else{
+					for(iterator = base->FirstChildElement(); iterator != NULL && strcmp(iterator->Value(),"else"); iterator = iterator->NextSiblingElement());
+				}
+				parseFromTag(gps,iterator);
+			}
+
+			if (!tagName.compare("while")){
+				while (cond){
+					parseFromTag(gps,base);
+					cond = getParsAtt(base,"exp");
+				}
+			}
+		}
+
+		
+
+		// interação com o parser
 		float getParsAtt(XMLElement*base,const char* name,float deft = 0){
 			const char* val = base->Attribute(name);
 			if (!val) return deft;
-			pars.setExpr(std::string(val));
+			pars.setExpr(val);
 			float res = pars.eval();
 			if (pars.error){
 				printf("Warning! Something went wrong parsing XML!\n");
@@ -166,6 +219,19 @@ class XMLParser{
 		}
 
 		void setParsAtt(XMLElement*base, int opt){
-			
+			float evaluation;
+
+			const char* target = base->Attribute("tgt");
+			if (!target || !target[0]) return;
+			std::string varTgt(target);
+
+			const char* value = base->Attribute("exp");
+			if (!(value)) value = "";
+
+			pars.setExpr(value);
+			evaluation = pars.evalOpts(opt);
+			if (pars.error) printf("Warning! Something went wrong parsing XML!\n");
+
+			pars.hash[varTgt] = evaluation;
 		}
 };

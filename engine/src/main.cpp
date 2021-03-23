@@ -15,6 +15,8 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <stdlib.h>
+#include <time.h>
 #include "tinyxml2.h"
 #include "tinyxml2.cpp"
 #include "string.h"
