@@ -1,6 +1,9 @@
+#include "expressionParser.cpp"
+
 class XMLParser{
 	public:
 		Scene* currentScene;
+		ExprParser pars("");
 
 		std::string fileName;
 		XMLDocument doc;
@@ -150,7 +153,19 @@ class XMLParser{
 			currentScene->cam.reset();
 		}
 
-		void parseAtt(XMLElement*base,const char* name,float default){
+		float getParsAtt(XMLElement*base,const char* name,float deft = 0){
+			const char* val = base->Attribute(name);
+			if (!val) return deft;
+			pars.setExpr(std::string(val));
+			float res = pars.eval();
+			if (pars.error){
+				printf("Warning! Something went wrong parsing XML!\n");
+				return deft;
+			}
+			return res;
+		}
+
+		void setParsAtt(XMLElement*base, int opt){
 			
 		}
 };

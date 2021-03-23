@@ -1,3 +1,15 @@
+#include <math.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <vector>
+#include <map>
+#include <algorithm>
+#include <string>
+#include <iostream>
+#include <fstream>
+
+
+#define IDNEV 0
 #define SQTEV 1
 #define SINEV 2
 #define TANEV 3
@@ -5,18 +17,18 @@
 
 class ExprParser{
 public:
-	std::map<std::string, float>*hash;
+	std::map<std::string, float> hash;
 	std::string expression;
 	int error = 0;
 	
-	ExprParser(std::string exp,std::map<std::string, float>*map){
-		this->expression = exp;
-		this->hash= map;
-		std::reverse(this->expression.begin(), this->expression.end());  
+	ExprParser(std::string exp){
+		setExpr(exp);
 	}
 
 	void setExpr(std::string exp){
+		error = 0;
 		this->expression = exp;
+		expression.erase(remove_if(expression.begin(), expression.end(), isspace), expression.end());
 		std::reverse(this->expression.begin(), this->expression.end()); 
 	}
 
@@ -65,7 +77,7 @@ public:
 			res.push_back(popChr());
 		}
 		try{
-			return hash->at(res.c_str());
+			return hash.at(res.c_str());
 		}
 		catch(std::exception& ia){
 			error = 1;
@@ -181,7 +193,7 @@ public:
 		return res;	
 	}
 
-	float evalOpts(int opt){
+	float evalOpts(int opt=IDNEV){
 		float res = this->eval();
 		error = !(isfinite(res));
 		if (!(error))
@@ -203,7 +215,6 @@ public:
 				break;
 	
 				default:
-				error = 1;
 				break;
 			}
 		error = !(isfinite(res));
@@ -211,15 +222,10 @@ public:
 	}
 };
 
-
-
-
-
 int main(int argc, char const *argv[]){
 	std::map<std::string, float>*hash = new std::map<std::string, float>();
-	ExprParser teste(std::string("-200"),hash);
-	(*hash)["x"] = 0;
-	printf("%f\n",teste.evalOpts(SINEV));
+	ExprParser teste(std::string("10 >1 "));
+	printf("%f\n",teste.evalOpts());
 	printf("%d\n",teste.error );
 	return 0;
 }
