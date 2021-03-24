@@ -36,6 +36,8 @@ class Camera{
 	// Constantes usadas referentes à sensibilidade, quer do mouse, quer do keyboard
 	GLdouble sensi;
 	GLdouble sensc;
+	GLdouble sensz;
+	GLfloat raio;
 
 	// Coordenadas iniciais
 	std::vector<GLfloat> origPosVec{0.0f,0.0f,10.0f};
@@ -99,10 +101,12 @@ class Camera{
 			break;
 	
 			case ZOM:												// Usando coordenadas polares e a constante de sensibilidade do rato calcula os novos valores da câmera
-			if (posVec[2] + xMove*sensi > 0){
-				this->posVec[2] += xMove*sensi;						// Limita o raio (distância da câmera ao centro)
+			if (posVec[2] + xMove*sensz > 0){
+				this->posVec[2] += xMove*sensz;						// Limita o raio (distância da câmera ao centro)
 			}
 			calcPosP();
+			this->sensz = (posVec[2] * sensz) / raio;
+			this->raio = posVec[2];
 			break;
 	
 			case FPR:												// Usando coordenadas polares e a constante de sensibilidade do rato calcula os novos valores da câmera
@@ -221,13 +225,13 @@ class Camera{
 		this->clickX = 0;
 		this->clickY = 0;
 		this->sensi = 0.01f;
+		this->sensz = 0.5f;
 		this->sensc = 0.1f;
-
 		this->posVec.assign(origPosVec.begin(), origPosVec.end());
-		this->centerVec = {0.0f,0.0f,-10.0f};
 		this->center.assign(origCenter.begin(), origCenter.end());
 		calcDir();
 		calcPosP();
+		this->raio = posVec[2];
 	}
 
 // Dá "place" da câmera de acordo com as coordenadas desta e do ponto de referência
