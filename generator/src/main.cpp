@@ -10,6 +10,7 @@
 #define SPH 3
 #define CON 4
 #define CYL 5
+#define TOR 6
 
 
 
@@ -64,6 +65,12 @@ int main(int argc, char const *argv[]){
 			shape += CYL;
 			shape *= checkArgs(2,2,fls,ins,argc,argv);
 		}
+        
+        else if (!strcmp(argv[1], "torus")){
+            shape += TOR;
+            shape *= checkArgs(2,2,fls,ins,argc,argv);
+        }
+
 	}
 
 	switch(shape){
@@ -86,6 +93,10 @@ int main(int argc, char const *argv[]){
 		case CYL:
 		Cylinder(fls[0],fls[1],ins[0],ins[1],argv[6]).build();
 		break;
+
+        case TOR:
+        Torus(fls[0],fls[1],ins[0],ins[1],argv[6]).build();
+        break;
 
 		default:
 		printf("Error: Generator called with invalid arguments!\n");

@@ -34,7 +34,7 @@ class Mesh{
 
 				1----2   -1  6    -1
 				| \  |       | \            -> na planificação, produziria um resultado [1,3,4,1,4,2,6,5,7]
-			 	3----4   -1  5----7  
+				3----4   -1  5----7  
 			*/
 		void trisPolyLine(){
 			int t = 0;
@@ -109,24 +109,24 @@ class Sphere : public Mesh{
 		float radius;
 		int slices,stacks;
 		
-  		
-  		Sphere(float radius, int slices, int stacks,const char* fileName):Mesh(fileName){
-          	this->radius = radius;
-          	this->stacks = stacks;
-          	this->slices = slices;
-          	this->vex = (slices*stacks) + 2;
+		
+		Sphere(float radius, int slices, int stacks,const char* fileName):Mesh(fileName){
+			this->radius = radius;
+			this->stacks = stacks;
+			this->slices = slices;
+			this->vex = (slices*stacks) + 2;
 		}
 
-  		void shape(){
+		void shape(){
 
 			float freqalf = (2*M_PI)/slices;
 			float freqbet = (M_PI)/(stacks+1);
-          	int vtxPts = 1;
+			int vtxPts = 1;
 
-          	std::vector<int> row;
+			std::vector<int> row;
 
-          	for (int st = 0; st < stacks+2; st++){
-          		row.clear();
+			for (int st = 0; st < stacks+2; st++){
+				row.clear();
 				for (int sl = 0; sl < slices; sl++){
 					if (!(st == 0 || st == stacks+1) || sl == slices-1){
 						std::vector<float> aux;
@@ -142,7 +142,7 @@ class Sphere : public Mesh{
 				}
 				(this->planar).push_back(row);
 			}
-        }	
+		}	
 };
 
 
@@ -165,7 +165,7 @@ class Cone : public Sphere{
 		}
 
 		void shape(){	
-          	int vtxPts = 1;
+			int vtxPts = 1;
 			float rat = (radius)/stacks;
 			float heiStck = height/(stacks);
 			float freq = (2*M_PI)/slices;
@@ -339,9 +339,9 @@ class Box : public Mesh{
 		}
 
 		void build(){
-          this->shape();
-          this->write3DFile();
-        }
+		  this->shape();
+		  this->write3DFile();
+		}
 };
 
 
@@ -363,7 +363,7 @@ class Cylinder : public Cone{
 		}
 
 		void shape(){	
-          	int vtxPts = 1;
+			int vtxPts = 1;
 			float heiStck = height/(stacks);
 			float freq = (2*M_PI)/slices;
 			
@@ -402,4 +402,59 @@ class Cylinder : public Cone{
 				(this->planar).push_back(row);
 			}
 		}	
+};
+
+
+
+
+
+
+/*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+
+
+
+
+class Torus : public Mesh{
+	public:
+		float intr,extr;
+		int slices,stacks;
+
+		Torus(float internRadius, float externRadius, int slices, int stacks, const char* fileName):Mesh(fileName){
+			this->vex = (slices*(stacks));
+			this->slices = slices;
+			this->stacks = stacks;
+			this->intr = internRadius;
+			this->extr = externRadius;
+		}
+
+		void shape(){
+			float alpha = (2*M_PI)/slices;
+			float beta = (2*M_PI)/(stacks-1);
+			  int vtxPts = 1;
+
+			  std::vector<int> row;
+
+			  for (int st = 0; st < stacks+1; st++){
+				 row.clear();
+				for (int sl = 0; sl < slices+1; sl++){
+					if (vtxPts < this->vex){
+						std::vector<float> aux;
+						aux.push_back(extr*(sin(alpha*sl)) + intr*sin(alpha*sl)*(cos(beta*st)));
+						aux.push_back(intr*(sin(beta*st)));
+						aux.push_back(extr*cos(alpha*sl) + intr*cos(alpha*sl)*cos(beta*st));
+						
+						(this->vertex).push_back(aux);
+						row.push_back(vtxPts++);
+					}
+
+					else{
+						row.push_back((vtxPts % this->vex)+1);
+						vtxPts++;
+					}
+
+				}
+				(this->planar).push_back(row);
+			}
+		}
 };
