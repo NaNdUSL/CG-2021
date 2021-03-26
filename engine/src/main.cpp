@@ -1,14 +1,6 @@
-#include <windows.h>
-#ifdef __APPLE__
-#include <GLUT/glut.h>
-#else
-#include <GL/glew.h>
-#include <GL/glut.h>
-#endif
-
+#define _USE_MATH_DEFINES
 #include <math.h>
 #include <stdio.h>
-#include <unistd.h>
 #include <vector>
 #include <map>
 #include <algorithm>
@@ -20,6 +12,13 @@
 #include "tinyxml2.h"
 #include "tinyxml2.cpp"
 #include "string.h"
+
+#ifdef __APPLE__
+#include <GLUT/glut.h>
+#else
+#include <GL/glew.h>
+#include <GL/glut.h>
+#endif
 
 using namespace tinyxml2;
  

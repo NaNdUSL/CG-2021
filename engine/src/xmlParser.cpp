@@ -1,4 +1,7 @@
+#include "tinyxml2.h"
 #include "expressionParser.cpp"
+
+using namespace tinyxml2;
 
 class XMLParser{
 	public:
@@ -6,7 +9,7 @@ class XMLParser{
 		ExprParser pars;
 
 		std::string fileName;
-		XMLDocument doc;
+		tinyxml2::XMLDocument doc;
 
 		int tris = 0;
 
