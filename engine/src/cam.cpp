@@ -106,6 +106,7 @@ class Camera{
 			}
 			calcPosP();
 			this->sensz = (posVec[2] * sensz) / raio;
+			this->sensc = (posVec[2] * sensc) / raio;
 			this->raio = posVec[2];
 			break;
 	
