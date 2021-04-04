@@ -5,23 +5,34 @@
 
 	<settings>
 		<camera>
-			<center X="0" Y="0" Z="0"/>
+			<center X="116.5" Y="0" Z="0"/>
 			<position A="pi/2" B="0" R="100"/>
 		</camera>
 		<background R="0.1" G="0.1" B="0.1" A="0.7"/>
 	</settings>
 
+	<set tgt="merRot" exp="130"/>
+	<set tgt="venRot" exp="40"/>
+	<set tgt="earRot" exp="15"/>
+	<set tgt="marRot" exp="86"/>
+	<set tgt="jupRot" exp="234"/>
+	<set tgt="satRot" exp="93"/>
+	<set tgt="urnRot" exp="69"/>
+	<set tgt="nepRot" exp="420"/>
+	<set tgt="pluRot" exp="42"/>
+
 	<group>
 
 		<!-- sun -->
 		<group>
-			<scale X="0.1" Y="0.1" Z="0.1" />
+			<scale X="0.6" Y="0.6" Z="0.6" />
 			<models>
 				<model file="sphere.3d" R="1.0" G="1.0" B="0.0" />
 			</models>
 
 			<!-- Mercury -->
 			<group>
+				<rotate angle="merRot" axisY="1"/>
 				<translate X="28.05"/>
 				<scale X="0.03505" Y="0.03505" Z="0.03505" />
 				<models>
@@ -31,6 +42,7 @@
 
 			<!-- Venus -->
 			<group>
+				<rotate angle="venRot" axisY="1"/>
 				<translate X="52.13"/>
 				<scale X="0.087" Y="0.087" Z="0.087" />
 				<models>
@@ -40,6 +52,7 @@
 
 			<!-- Earth -->
 			<group>
+				<rotate angle="earRot" axisY="1"/>
 				<translate X="71.94"/>
 				<scale X="0.091" Y="0.091" Z="0.091" />
 				<models>
@@ -59,6 +72,7 @@
 
 			<!-- Mars -->
 			<group>
+				<rotate angle="marRot" axisY="1"/>
 				<translate X="116.5"/>
 				<scale X="0.049" Y="0.049" Z="0.049" />
 				<models>
@@ -86,44 +100,40 @@
 				</group>
 			</group>
 
-			<!-- Ring -->
+			<!-- Inner Ring -->
 			<group>
-				<set tgt="radiusRocks" exp="500" />
-				<set tgt="rockNum" exp="500" />
+				<set tgt="radiusRocks" exp="150" />
+				<set tgt="radiusRocksMax" exp="160" />
+				<set tgt="rockNum" exp="700" />
+				
 				<while exp="rockNum > 0">
-					<rand tgt="ztrs"/>
+					<rand tgt="ang"/>
 					<rand tgt="xtrs"/>
-					<set tgt="ztrs" exp= "(ztrs*2960)-1480"/>
-					<set tgt="xtrs" exp= "(xtrs*2960)-1480"/>
-					<set tgt="dist" exp="(xtrs*xtrs) + (ztrs*ztrs)" />
-					<set tgt="dist" exp="dist * 6" />
-					<if exp= "dist > (radiusRocks*radiusRocks)">
-						<then>
-							<if exp= "dist < ((radiusRocks*radiusRocks)*1.2)">
-								<then>
-									<set tgt= "rockNum" exp="rockNum-1" />
-									<group>
-										<translate X="xtrs" Z="ztrs"/>
-										<set tgt="scl" exp="0.08"/>
-										<scale  X="scl" Y="scl" Z="scl" />
-										<set tgt="minRads" exp="5"/>
-										<rand tgt="zscl"/>
-										<group>
-											<scale  X="scl" Y="scl" Z="scl" />
-											<models>
-												<model file="sphere.3d" R="0.4" G="0.4" B="0.4"/>
-											</models>
-										</group>
-									</group>
-								</then>
-							</if>
-						</then>
-					</if>
+					
+					<set tgt="xtrs" exp= "(xtrs*radiusRocksMax)+radiusRocks"/>
+					
+					<set tgt= "rockNum" exp="rockNum-1" />
+					<group>
+						<rotate angle="ang*360" axisY="1"/>
+						<translate X="xtrs"/>
+						<set tgt="scl" exp="0.5"/>
+						<scale  X="scl" Y="scl" Z="scl" />
+						<set tgt="minRads" exp="5"/>
+						<rand tgt="zscl"/>
+						<group>
+							<scale  X="scl" Y="scl" Z="scl" />
+							<models>
+								<model file="asteroid.3d" R="0.4" G="0.4" B="0.4"/>
+							</models>
+						</group>
+					</group>
 				</while>
 			</group>
 
+
 			<!-- Jupiter -->
 			<group>
+				<rotate angle="jupRot" axisY="1"/>
 				<set tgt="moonNum" exp="9" />
 				<translate X="373"/>
 				<scale X="0.2" Y="0.2" Z="0.2" />
@@ -171,6 +181,7 @@
 
 			<!-- Saturn -->
 			<group>
+				<rotate angle="satRot" axisY="1"/>
 				<translate X="532"/>
 				<scale X="0.1836" Y="0.1836" Z="0.1836" />
 				<models>
@@ -187,6 +198,7 @@
 
 			<!-- Uranus -->
 			<group>
+				<rotate angle="urnRot" axisY="1"/>
 				<translate X="687.33"/>
 				<scale X="0.1365" Y="0.1365" Z="0.1365" />
 				<models>
@@ -203,6 +215,7 @@
 
 			<!-- Neptune -->
 			<group>
+				<rotate angle="nepRot" axisY="1"/>
 				<translate X="776.03"/>
 				<scale X="0.1354" Y="0.1354" Z="0.1354" />
 				<models>
@@ -212,6 +225,7 @@
 
 			<!-- Pluto -->
 			<group>
+				<rotate angle="pluRot" axisY="1"/>
 				<translate X="915.19"/>
 				<scale X="0.017" Y="0.017" Z="0.017" />
 				<models>
@@ -221,3 +235,7 @@
 		</group>
 	</group>
 </scene>
+
+
+
+
