@@ -66,7 +66,16 @@
 
 		<group>
 			<translate Y="30"/>
-			<scale X="0.51" Y="0.7" Z="0.52" />
+			<scale X="0.34" Y="0.4" Z="0.34" />
+			<models>
+				<model file="tor.3d" R="0.02" G="0.454" B="0.383"/>
+			</models>
+		</group>
+
+
+		<group>
+			<translate Y="30"/>
+			<scale X="0.46" Y="0.7" Z="0.46" />
 			<models>
 				<model file="sphere.3d" R="0.65" G="0.4" B="0.8"/>
 			</models>
