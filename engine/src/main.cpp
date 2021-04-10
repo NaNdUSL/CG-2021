@@ -13,6 +13,9 @@
 #include "tinyxml2.cpp"
 #include "string.h"
 
+
+#include <IL/il.h>
+
 #ifdef __APPLE__
 #include <GLUT/glut.h>
 #else
@@ -152,6 +155,10 @@ int main(int argc,  char **argv) {
 	glutMouseFunc(detectMouseButs);
 	glutMotionFunc(control);
 	glutKeyboardFunc(keyInput);
+
+	
+	// Start Devil
+	ilInit();
 
 	// Start Glew and read Models for memory and VBO
 	glewInit();

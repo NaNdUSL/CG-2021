@@ -8,12 +8,25 @@ class Model{
 	GLuint vertex;
 	GLuint indices;
 
+	unsigned int hm,hmw,hmh;
+	unsigned char *imageData;
+
+	float intensity;
+
 	Model(){
 	}
 
 	Model(std::string fileName){
 		readFile(fileName);
-		
+		prepareDataVBO();
+	}
+
+	Model(std::string fileName,std::string hmapFile,float inten){
+		readFile(fileName);
+		printf("bruh");
+		loadImage(hmapFile);
+		intensity = inten;
+		setHeightMap();
 		prepareDataVBO();
 	}
 
@@ -72,6 +85,44 @@ class Model{
     	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     	indexNumber = (unsigned int) facesList.size();
+	}
+
+
+	void loadImage(std::string hmapFile){
+		ilGenImages(1,&hm);
+		ilBindImage(hm);
+		ilLoadImage((ILstring) hmapFile.c_str());
+		ilConvertImage(IL_LUMINANCE, IL_UNSIGNED_BYTE);
+
+		hmw = ilGetInteger(IL_IMAGE_WIDTH);
+		hmh = ilGetInteger(IL_IMAGE_HEIGHT);
+
+		imageData = ilGetData();
+	}
+
+	void setHeightMap(float nLins=0,float nCols=0){
+		unsigned int lastVx = vertexList.size()/3;
+
+		if (!(nLins)) nLins = sqrt((float)lastVx); 
+		if (!(nCols)) nCols = sqrt((float)lastVx);
+		
+		//printf("%f\n",nLins);
+
+		for(int h = 0; h < (vertexList.size()/3); h++){
+			float pixelH = (float)h/ (float)lastVx;
+
+
+			float lin = floor(((float)h)/nCols);
+			float col = floor((float)h - lin*nCols);
+
+			lin = (lin/nLins)*hmh;
+			col = (col/nCols)*hmw;
+
+
+			int pix = ((int)lin)*hmw;
+			pix += ((int)col);
+			vertexList[(h*3)+1] += ((float)imageData[pix]/255)*intensity;
+		}
 	}
 };
 

@@ -93,8 +93,10 @@ class XMLParser{
 				color.push_back(getParsAtt(iterator,"B", 0.5f));
 
 
+
 				if ( (*(currentScene->modelTable)).find(fileName) == (*(currentScene->modelTable)).end()){
-					(*(currentScene->modelTable))[fileName] = new Model(fileName);
+					if (iterator->Attribute("hmap")) (*(currentScene->modelTable))[fileName] = new Model(fileName,std::string (iterator->Attribute("hmap")),getParsAtt(iterator,"I", 30)); 
+					else (*(currentScene->modelTable))[fileName] = new Model(fileName);
 				}
 				tris += (int)((*(currentScene->modelTable))[fileName])->facesList.size();
 				parent.models.push_back( std::pair<std::vector<float>, Model*>(color,(*(currentScene->modelTable))[fileName]));
