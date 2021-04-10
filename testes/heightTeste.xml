@@ -1,0 +1,17 @@
+<scene>
+	
+	<settings>
+		<camera>
+			<center X="0" Y="0" Z="0"/>
+			<position A="0" B="40" R="10"/>
+		</camera>
+		<background R="0.2" G="0.4" B="0.4" A="0.4"/>
+	</settings>
+
+	<group>
+		<scale X="3" Y="3" Z="3" />
+		<models>
+			<model file="terreno.3d" hmap="terreno.jpg" R="1" G="1" B="1"/>
+		</models>
+	</group>
+</scene>
