@@ -118,17 +118,14 @@ class Scene{
 				
 				case 'l':
 				if (speedUp++ > 50) speedUp = 50;
-				printf("aaa\n");
 				break;
 
 				case 'k':
 				if (--speedUp < 1) speedUp = 1;
-				printf("bbb\n");
 				break;
 
 				case 'j':
 				notPause = !(notPause);
-				printf("cccc\n");
 				break;
 
 				default:
