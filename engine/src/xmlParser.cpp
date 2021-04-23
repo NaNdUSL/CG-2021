@@ -109,7 +109,20 @@ class XMLParser{
 			v.push_back(getParsAtt(base,"X"));
 			v.push_back(getParsAtt(base,"Y"));
 			v.push_back(getParsAtt(base,"Z"));
-			parent.trans.push_back(new Translate(v));
+			float t = getParsAtt(base,"time",-1);
+			if (t > 0){
+				std::vector<float> points;
+				XMLElement* iterator;
+				for(iterator = base->FirstChildElement(); iterator != NULL; iterator = iterator->NextSiblingElement()){
+					points.push_back(getParsAtt(iterator,"X"));
+					points.push_back(getParsAtt(iterator,"Y"));
+					points.push_back(getParsAtt(iterator,"Z"));
+				}
+				parent.trans.push_back(new CatmullTranslate(t,points));
+			}
+			else{
+				parent.trans.push_back(new Translate(v));
+			}
 		}
 
 		void parseRotate(Group &parent,XMLElement* base){
@@ -117,7 +130,13 @@ class XMLParser{
 			v.push_back(getParsAtt(base,"axisX"));
 			v.push_back(getParsAtt(base,"axisY"));
 			v.push_back(getParsAtt(base,"axisZ"));
-			parent.trans.push_back(new Rotate(v,getParsAtt(base,"angle")));
+			float t = getParsAtt(base,"time",-1);
+			if (t > 0){
+				parent.trans.push_back(new TimedRotation(t,v));
+			}
+			else{
+				parent.trans.push_back(new Rotate(v,getParsAtt(base,"angle")));
+			}
 		}
 
 		void parseScale(Group &parent,XMLElement* base){

@@ -23,7 +23,6 @@ class Model{
 
 	Model(std::string fileName,std::string hmapFile,float inten){
 		readFile(fileName);
-		printf("bruh");
 		loadImage(hmapFile);
 		intensity = inten;
 		setHeightMap();

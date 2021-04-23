@@ -21,6 +21,11 @@ class Scene{
 		int oAxisDr = 100;
 		// cameraCenter Axis
 		int ccAxisDr = 0;
+		
+		// if the animation controls
+		int speedUp = 1;
+		int notPause = 1;
+		int lastMeasure = glutGet(GLUT_ELAPSED_TIME);
 
 
 		//- Engine Starter Options
@@ -28,8 +33,11 @@ class Scene{
 
 
 		void drawGroups(){
+			int now = glutGet(GLUT_ELAPSED_TIME);
+			int elapsed = ((now - lastMeasure)*speedUp*notPause);
+			lastMeasure = now; 
 			for (Group g: (*groups)){
-				g.makeGroup();
+				g.makeGroup(elapsed);
 			}
 		}
 
@@ -108,6 +116,21 @@ class Scene{
 				else ccAxisDr = 1;
 				break;
 				
+				case 'l':
+				if (speedUp++ > 50) speedUp = 50;
+				printf("aaa\n");
+				break;
+
+				case 'k':
+				if (--speedUp < 1) speedUp = 1;
+				printf("bbb\n");
+				break;
+
+				case 'j':
+				notPause = !(notPause);
+				printf("cccc\n");
+				break;
+
 				default:
 				break;
 			}

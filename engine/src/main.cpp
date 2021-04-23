@@ -110,7 +110,7 @@ void renderScene(void){
 
 	// Draw Scene
 	float fps = scene->getFPS();
-	if (!(fps < 0)) glutSetWindowTitle(((scene->name) + " - FPS: " + std::to_string(fps)).c_str());
+	if (!(fps < 0)) glutSetWindowTitle(((scene->name) + " - FPS: " + ((std::to_string(fps)).c_str()) + " - " + (std::to_string(scene->speedUp).c_str()) + "x ").c_str());
 	scene->drawGroups();
 
 
