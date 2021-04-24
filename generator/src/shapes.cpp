@@ -16,6 +16,7 @@ class Mesh{
 		
 		// - Construtor :: recebe o nome do ficheiro onde o shape será escrito
 		Mesh(const char* file){
+			
 			this->fileName = file;
 		}
 
@@ -62,7 +63,9 @@ class Mesh{
 					}
 				}
 			}
+
 			this -> facs = t;
+
 		}
 
 
@@ -71,7 +74,9 @@ class Mesh{
 		void write3DFile(){
 			std::ofstream File2Wr;
 			File2Wr.open(this->fileName);
+
 			File2Wr << vex << "\n" << facs <<"\n";
+
 			for (std::vector<float> &v : this->vertex){
 				for (float &point : v){
 					File2Wr << point << "\n";
@@ -80,6 +85,7 @@ class Mesh{
 			for (int face:faces){
 				File2Wr << face << "\n";
 			}
+
 			File2Wr.close();
 		}
 
@@ -87,7 +93,9 @@ class Mesh{
 		// - Método que gera o shape, a malha e escreve em ficheiro
 		void build(){
 			this->shape();
+
 			this->trisPolyLine();
+
 			this->write3DFile();
 		}
 };
@@ -456,5 +464,175 @@ class Torus : public Mesh{
 				}
 				(this->planar).push_back(row);
 			}
+		}
+};
+
+
+
+/*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+
+
+
+class Bezier : public Mesh{
+	public:
+		float tessFact = 0;
+		int tesselationLv = 0;
+		int patcheNum = 0;
+		std::vector<std::vector<std::vector<float>>> curves;
+
+
+		Bezier(std::string fileName, int tesselation, const char* file):Mesh(file){
+			tessFact = 1.0f/((float) tesselation);
+			tesselationLv = tesselation;
+
+			readPatches(fileName);
+			this->vex = ((tesselation+1) * (tesselation+1))*patcheNum;
+		}
+
+		void readPatches(std::string fileName){
+			std::ifstream file(fileName.c_str());
+			
+			std::vector<std::vector<int>> indexes;
+			std::vector<std::vector<float>> points;
+			
+			file >> patcheNum;
+			
+			
+			std::vector<int> aux;
+			std::string lmao;
+			for (int i = 0; i < patcheNum; i++){
+				aux.clear();
+				lmao.clear();
+				for (int j = 0; j < 15 ; j++){
+					std::getline(file,lmao,',');
+					aux.push_back(std::stoi(lmao));
+				}
+				std::getline(file,lmao);
+				aux.push_back(std::stoi(lmao));
+				indexes.push_back(aux);
+			}
+
+
+
+			int pointsNum = 0;
+			file >> pointsNum;
+
+			std::vector<float> flAux;
+			for (int i = 0; i < pointsNum; i++){
+				flAux.clear();
+				lmao.clear();
+				for (int j = 0; j < 2; j++){
+					std::getline(file,lmao,',');
+					flAux.push_back(std::stof(lmao));
+
+				}
+				std::getline(file,lmao);
+				flAux.push_back(std::stof(lmao));
+
+				flAux.push_back(1.0f);
+				points.push_back(flAux);
+			}
+
+
+			std::vector<std::vector<float>> curve;
+			for(std::vector<int> row : indexes){
+				curve.clear();
+				int count = 0;
+				for (int i : row){
+					curve.push_back(points[i]);
+					count++;
+					if (count > 3){
+						curves.push_back(curve);
+						curve.clear();
+						count = 0;
+					}
+				}
+			}		
+		}
+
+
+		void shape(){
+
+			float u = 0;
+			float v = 0;
+			int vtxPts = 1;
+			std::vector<int> row;
+			
+			for (int kk = 0; kk < patcheNum; kk++){
+				u = 0;
+				std::vector<std::vector<float>> interCurve;
+				for (int i = 0; i <= tesselationLv; i++){
+					interCurve.clear();
+					row.clear();
+					
+					interCurve.push_back(getCurrPoint(curves[(kk*4)],u));
+					interCurve.push_back(getCurrPoint(curves[(kk*4)+1],u));
+					interCurve.push_back(getCurrPoint(curves[(kk*4)+2],u));
+					interCurve.push_back(getCurrPoint(curves[(kk*4)+3],u));
+					
+					v = 0;
+					for (int j = 0; j <= tesselationLv; j++){
+
+						std::vector<float> newPoint = getCurrPoint(interCurve,v);
+						newPoint.erase(newPoint.begin() + 3); 
+						vertex.push_back(newPoint);
+
+						row.push_back(vtxPts++);
+						v += tessFact;
+					}
+					row.push_back((-1));
+					
+					(this->planar).insert(this->planar.begin(), row);
+					u += tessFact;
+				}
+
+				row.clear();
+				for (int i = 0; i < tesselationLv+2; i++){
+					row.push_back(-1);
+					
+				}
+				(this->planar).insert(this->planar.begin(), row);
+				
+			}
+
+
+		}
+
+
+		void matDotVec(std::vector<std::vector<float>> mat, std::vector<float> vec, std::vector<float>*res){
+			(*res).clear();
+			for (int i = 0; i < (int) mat.size(); i++){
+				(*res).push_back(0);
+				for (int j = 0; j < (int) mat[0].size(); j++){
+					(*res)[i] = (*res)[i] + (vec[j] * (mat[i][j]));
+				}
+			}
+		}
+
+		
+
+		std::vector<float> getCurrPoint(std::vector<std::vector<float>> pts,float t){
+			std::vector<float> point;
+			std::vector<std::vector<float>>bezierM = {
+					{-1.0f,  3.0f, -3.0f,  1.0f},
+					{ 3.0f, -6.0f,  3.0f, 0.0f},
+					{-3.0f,  3.0f,  0.0f,  0.0f},
+					{ 1.0f,  0.0f,  0.0f,  0.0f}
+					};
+
+			std::vector<std::vector<float>> a;
+			std::vector<float> T = { (float)pow(t,3),(float)pow(t,2),t,1 };
+			
+			for (int i = 0;  i < 4; i++){
+				a.push_back({0});
+				std::vector<float> p = { pts[0][i],pts[1][i],pts[2][i],pts[3][i] };
+				matDotVec(bezierM, p, &a[i]);
+			}
+
+			point.clear();
+			matDotVec(a,T,&point);
+
+			return point;
 		}
 };

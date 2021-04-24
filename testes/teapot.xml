@@ -1,0 +1,16 @@
+<scene>
+	<settings>
+		<camera>
+			<center X="0" Y="0" Z="0"/>
+			<position A="0" B="40" R="10"/>
+		</camera>
+		<background R="0.2" G="0.4" B="0.4" A="0.4"/>
+	</settings>
+
+	<group>
+		<scale X="0.2" Y="0.2" Z="0.2"/>
+		<models>
+			<model file="teap.3d" R="0.02" G="0.654" B="0.583"/> 
+		</models>
+	</group>
+</scene>

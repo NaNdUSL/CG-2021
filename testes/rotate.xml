@@ -14,17 +14,58 @@
 
 		<group>
 			
-		<translate time="20">
-			<point X="-1" Y="-1" Z="0"/>
-			<point X="-1" Y="1" Z="0"/>
-			<point X="1" Y="1" Z="0"/>
-			<point X="0" Y="0" Z="0"/>
-			<point X="1" Y="-1" Z="0"/>
-		</translate>
+			<translate time="20">
+				<point X="-1" Y="-1" Z="0"/>
+				<point X="-1" Y="1" Z="0"/>
+				<point X="1" Y="1" Z="0"/>
+				<point X="0" Y="0" Z="0"/>
+				<point X="1" Y="-1" Z="0"/>
+			</translate>
 			<scale X="0.02" Y="0.02" Z="0.02" />
-			<models>
-				<model file="box.3d" R="1" G="1" B="1"/>
-			</models>
+			<!-- penis -->
+			<group>
+				<scale X="0.7" Y="0.7" Z="0.7" />
+				<group>
+					<translate Y="16"/>
+					<scale X="0.54" Y="6" Z="0.55" />
+					<models>
+						<model file="cyl.3d" R="0.02" G="0.654" B="0.583"/>
+					</models>
+				</group>
+
+				<group>
+					<translate Y="30"/>
+					<scale X="1.6" Y="1.2" Z="1.6" />
+					<models>
+						<model file="torus.3d" R="0.02" G="0.454" B="0.383"/>
+					</models>
+				</group>
+
+
+				<group>
+					<translate Y="30"/>
+					<scale X="0.46" Y="0.7" Z="0.46" />
+					<models>
+						<model file="sphere.3d" R="0.65" G="0.4" B="0.8"/>
+					</models>
+				</group>
+
+				<group>
+					<translate Y="3" X="8"/>
+					<scale X="0.3+0.45" Y="0.3+0.47" Z="0.3+0.5" />
+					<models>
+						<model file="sphere.3d" R="0.02" G="0.76" B="0.68"/>
+					</models>
+				</group>
+
+				<group>
+					<translate Y="3" Z="7.5"/>
+					<scale X="0.3+0.35" Y="0.3+0.4" Z="0.3+0.5" />
+					<models>
+						<model file="sphere.3d" R="0.02" G="0.76" B="0.68"/>
+					</models>
+				</group>
+			</group> 
 		</group>
 	</group>
 </scene>
