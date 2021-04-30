@@ -50,6 +50,9 @@ class Camera{
 	// Vetor normal paralelo ao plano XZ que representa o sentido da câmera
 	std::vector<GLfloat> dirVec{1.0f, 0.0f, 1.0f};
 
+	// Vetor normal com o mesmo sentido que a câmera
+	std::vector<GLfloat> oriVec{1.0f, 0.0f, 1.0f};
+
 	// Coordenadas das posições da câmera e do centro
 	std::vector<GLfloat> pos{0.0f, 0.0f, 0.0f};
 	std::vector<GLfloat> center{0.0f, 0.0f, 0.0f};
@@ -93,8 +96,7 @@ class Camera{
 		switch (moveState){
 			case FCR:												// Usando coordenadas polares e a constante de sensibilidade do rato calcula os novos valores do "centro"
 			this->centerVec[0] += xMove*sensi;
-			this->centerVec[1] += yMove*sensi;
-			if (abs(centerVec[1] + yMove*sensi) > (M_PI/2)){		// Limita o ângulo do centro entre -PI/2 e PI/2
+			if (abs(centerVec[1] + yMove*sensi) < (M_PI/2)){		// Limita o ângulo do centro entre -PI/2 e PI/2
 				this->centerVec[1] += yMove*sensi;
 			}
 			calcCenterP();
@@ -129,6 +131,7 @@ class Camera{
 	// Deteta a key pressionada e calcula as novas coordenadas da câmera e do centro de acordo com a translação pretendida
 	void detectKeyboard(unsigned char key, int x, int y){
 		calcDir();
+		calcOri();
 		glutGetModifiers();
 		switch (key){											// Para "WASD" basta atualizar os valores de X e de Z e para space_key e "C" atualiza o valor de Y
 			case 'w':
@@ -153,6 +156,38 @@ class Camera{
 				break;
 
 			case 'd':
+				this->pos[0] -= this->dirVec[2]*sensc;
+				this->pos[2] += this->dirVec[0]*sensc;
+				this->center[0] -= this->dirVec[2]*sensc;
+				this->center[2] += this->dirVec[0]*sensc;
+				break;
+
+			case 't':
+				this->pos[0] += this->oriVec[0]*sensc;
+				this->pos[1] += this->oriVec[1]*sensc;
+				this->pos[2] += this->oriVec[2]*sensc;
+				this->center[0] += this->oriVec[0]*sensc;
+				this->center[1] += this->oriVec[1]*sensc;
+				this->center[2] += this->oriVec[2]*sensc;
+				break;
+	
+			case 'g':
+				this->pos[0] -= this->oriVec[0]*sensc;
+				this->pos[1] -= this->oriVec[1]*sensc;
+				this->pos[2] -= this->oriVec[2]*sensc;
+				this->center[0] -= this->oriVec[0]*sensc;
+				this->center[1] -= this->oriVec[1]*sensc;
+				this->center[2] -= this->oriVec[2]*sensc;
+				break;
+
+			case 'f':
+				this->pos[0] += this->dirVec[2]*sensc;
+				this->pos[2] -= this->dirVec[0]*sensc;
+				this->center[0] += this->dirVec[2]*sensc;
+				this->center[2] -= this->dirVec[0]*sensc;
+				break;
+
+			case 'h':
 				this->pos[0] -= this->dirVec[2]*sensc;
 				this->pos[2] += this->dirVec[0]*sensc;
 				this->center[0] -= this->dirVec[2]*sensc;
@@ -204,6 +239,10 @@ class Camera{
 		normalize((center[0] - pos[0]), 0, (center[2] - pos[2]), this->dirVec);
 	}
 
+	void calcOri(){
+		normalize((center[0] - pos[0]), (center[1] - pos[1]), (center[2] - pos[2]), this->oriVec);
+	}
+
 // Método que calcula o vetor perpendicular a dois vetores que não sejam paralelos entre si
 	void ortVec(std::vector<GLfloat> vec1, std::vector<GLfloat> vec2, std::vector<GLfloat> &retVec){
 		retVec.clear();
@@ -225,12 +264,13 @@ class Camera{
 		this->moveState = 0;
 		this->clickX = 0;
 		this->clickY = 0;
-		this->sensi = 0.01f;
+		this->sensi = 0.005f;
 		this->sensz = 0.5f;
-		this->sensc = 0.1f;
+		this->sensc = 0.5f;
 		this->posVec.assign(origPosVec.begin(), origPosVec.end());
 		this->center.assign(origCenter.begin(), origCenter.end());
 		calcDir();
+		calcOri();
 		calcPosP();
 		this->raio = posVec[2];
 	}
