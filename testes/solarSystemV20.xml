@@ -1,0 +1,335 @@
+<scene>
+	<pi tgt="pi"/>
+
+	<!-- settings -->
+
+	<settings>
+		<camera>
+			<center X="0" Y="0" Z="0"/>
+			<position A="pi/2" B="0" R="100"/>
+		</camera>
+		<background R="0.1" G="0.1" B="0.1" A="0.7"/>
+	</settings>
+
+	<set tgt="merRot" exp="2"/>
+	<set tgt="venRot" exp="-1"/>
+	<set tgt="earRot" exp="3"/>
+	<set tgt="marRot" exp="5"/>
+	<set tgt="jupRot" exp="7"/>
+	<set tgt="satRot" exp="6"/>
+	<set tgt="urnRot" exp="4"/>
+	<set tgt="nepRot" exp="1"/>
+	<set tgt="pluRot" exp="-20"/>
+
+	<group>
+
+		<!-- sun -->
+		<group>
+			<scale X="0.6" Y="0.6" Z="0.6" />
+			<models>
+				<model file="sphere.3d" R="1.0" G="1.0" B="0.0" />
+			</models>
+
+			<!-- Mercury -->
+			<group>
+				<rotate angle="merRot" axisX="1"/>
+				<translate time="200">
+					<point X="21.037498" Y="0" Z="0"/>
+					<point X="10.518749" Y="0" Z="-24.292011"/>
+					<point X="0" Y="0" Z="-28.049999"/>
+					<point X="-10.518749" Y="0" Z="-24.292011"/>
+					<point X="-21.037498" Y="0" Z="0"/>
+					<point X="-10.518749" Y="0" Z="24.292011"/>
+					<point X="0" Y="0" Z="28.049999"/>
+					<point X="10.518749" Y="0" Z="24.292011"/> 
+				</translate>
+				<scale X="0.03505" Y="0.03505" Z="0.03505" />
+				<models>
+					<model file="sphere.3d" R="0.86" G="0.86" B="0.86" />
+				</models>
+			</group>
+
+			<!-- Venus -->
+			<group>
+				<rotate angle="venRot" axisX="1"/>
+				<translate time="400">
+					<point X="39.097500" Y="0" Z="0"/>
+					<point X="19.548750" Y="0" Z="-45.145906"/>
+					<point X="0" Y="0" Z="-52.130001"/>
+					<point X="-19.548750" Y="0" Z="-45.145906"/>
+					<point X="-39.097500" Y="0" Z="0"/>
+					<point X="-19.548750" Y="0" Z="45.145906"/>
+					<point X="0" Y="0" Z="52.130001"/>
+					<point X="19.548750" Y="0" Z="45.145906"/>
+				</translate>
+				<scale X="0.087" Y="0.087" Z="0.087" />
+				<models>
+					<model file="sphere.3d" R="1.0" G="0.64" B="0.0" />
+				</models>
+			</group>
+
+			<!-- Earth -->
+			<group>
+				<rotate angle="earRot" axisX="1"/>
+				<translate time="500">
+					<point X="53.955002" Y="0" Z="0"/>
+					<point X="26.977501" Y="0" Z="-62.301870"/>
+					<point X="0" Y="0" Z="-71.940002"/>
+					<point X="-26.977501" Y="0" Z="-62.301870"/>
+					<point X="-53.955002" Y="0" Z="0"/>
+					<point X="-26.977501" Y="0" Z="62.301870"/>
+					<point X="0" Y="0" Z="71.940002"/>
+					<point X="26.977501" Y="0" Z="62.301870"/> 
+				</translate>
+				<scale X="0.091" Y="0.091" Z="0.091"/>
+				<group>
+					<rotate time="100" axisX="0" axisY="1" axisZ="0"/>
+					<models>
+						<model file="sphere.3d" R="0.12" G="0.56" B="1.0" />
+					</models>
+				</group>
+				<group>
+					<rand tgt="degree"/>
+					<set tgt="rot" exp="degree*360" />
+					<translate time="10">
+						<point X="42.67" Y="42.67" Z="0"/>
+						<point X="-60.34" Y="0" Z="0"/>
+						<point X="-42.67" Y="-42.67" Z="0"/>
+						<point X="60.34" Y="0" Z="0"/>
+					</translate>
+					<scale X="0.27" Y="0.27" Z="0.27" />
+					<models>
+						<model file="sphere.3d" R="0.86" G="0.86" B="0.86" />
+					</models>
+				</group>
+			</group>
+
+			<!-- Mars -->
+			<group>
+				<rotate angle="marRot" axisX="1"/>
+				<translate time="550">
+					<point X="87.375000" Y="0" Z="0"/>
+					<point X="43.687500" Y="0" Z="-100.891960"/>
+					<point X="0" Y="0" Z="-116.500000"/>
+					<point X="-43.687500" Y="0" Z="-100.891960"/>
+					<point X="-87.375000" Y="0" Z="0"/>
+					<point X="-43.687500" Y="0" Z="100.891960"/>
+					<point X="0" Y="0" Z="116.500000"/>
+					<point X="43.687500" Y="0" Z="100.891960"/>
+				</translate>
+				<scale X="0.049" Y="0.049" Z="0.049" />
+				<models>
+					<model file="sphere.3d" R="1.0" G="0.12" B="0.0" />
+				</models>
+				<group>
+					<translate time="10">
+						<point X="60.92" Y="35.17" Z="0"/>
+						<point X="-70.34" Y="0" Z="0"/>
+						<point X="-35.17" Y="-60.92" Z="0"/>
+						<point X="70.34" Y="0" Z="0"/>
+					</translate>
+					<scale X="0.2" Y="0.2" Z="0.2" />
+					<models>
+						<model file="sphere.3d" R="0.86" G="0.86" B="0.86" />
+					</models>
+				</group>
+				<group>
+					<rotate angle="10" axisX="1"/>
+					<translate time="10">
+						<point X="60.34" Y="0" Z="0"/>
+						<point X="0" Y="0" Z="-60.34"/>
+						<point X="-60.34" Y="0" Z="0"/>
+						<point X="0" Y="0" Z="60.34"/>
+					</translate>
+					<scale X="0.27" Y="0.27" Z="0.27" />
+					<models>
+						<model file="sphere.3d" R="0.86" G="0.86" B="0.86" />
+					</models>
+				</group>
+			</group>
+
+			<!-- Inner Ring -->
+			<group>
+				<set tgt="radiusRocks" exp="160" />
+				<set tgt="radiusRocksMax" exp="50" />
+				<set tgt="rockNum" exp="200" />
+				
+				<while exp="rockNum > 0">
+					<rand tgt="ang"/>
+					<rand tgt="xtrs"/>
+					
+					<set tgt="xtrs" exp= "(xtrs*radiusRocksMax)+radiusRocks"/>
+					
+					<set tgt= "rockNum" exp="rockNum-1" />
+					<group>
+						<rotate angle="ang*360" axisY="1"/>
+						<translate X="xtrs"/>
+						<set tgt="scl" exp="0.5"/>
+						<scale  X="scl" Y="scl" Z="scl" />
+						<set tgt="minRads" exp="5"/>
+						<rand tgt="zscl"/>
+						<group>
+							<scale  X="scl" Y="scl" Z="scl" />
+							<models>
+								<model file="asteroid.3d" R="0.4" G="0.4" B="0.4"/>
+							</models>
+						</group>
+					</group>
+				</while>
+			</group>
+
+
+			<!-- Jupiter -->
+			<group>
+				<rotate angle="jupRot" axisX="1"/>
+				<set tgt="moonNum" exp="9" />
+				<translate time="420">
+					<point X="279.750000" Y="0" Z="0"/>
+					<point X="139.875000" Y="0" Z="-323.027476"/>
+					<point X="0" Y="0" Z="-373.000000"/>
+					<point X="-139.875000" Y="0" Z="-323.027476"/>
+					<point X="-279.750000" Y="0" Z="0"/>
+					<point X="-139.875000" Y="0" Z="323.027476"/>
+					<point X="0" Y="0" Z="373.000000"/>
+					<point X="139.875000" Y="0" Z="323.027476"/>
+				</translate>
+				<scale X="0.2" Y="0.2" Z="0.2" />
+				<models>
+					<model file="sphere.3d" R="0.74" G="0.56" B="0.56" />
+				</models>
+				<group>
+					<set tgt="radiusRocks" exp="50" />
+					<set tgt="rockNum" exp="9" />
+					<while exp="rockNum > 0">
+						<rand tgt="ztrs"/>
+						<rand tgt="xtrs"/>
+						<set tgt="ztrs" exp= "(ztrs*370)-185"/>
+						<set tgt="xtrs" exp= "(xtrs*370)-185"/>
+						<set tgt="dist" exp="(xtrs*xtrs) + (ztrs*ztrs)" />
+						<set tgt="dist" exp="dist * 6" />
+						<if exp= "dist > (radiusRocks*radiusRocks)*1.1">
+							<then>
+								<if exp= "dist < ((radiusRocks*radiusRocks)*1.5)">
+									<then>
+										<set tgt= "rockNum" exp="rockNum-1" />
+										<group>
+											<rand tgt="degs"/>
+											<set tgt="rotat" exp="degs*360" />
+											<rotate angle="rotat" axisY="1" axisX="1" axisZ="0" />
+											<translate time="10">
+												<point X="xtrs*1.5" Y="0" Z="0"/>
+												<point X="0" Y="0" Z="(-1)*(xtrs*1.5)"/>
+												<point X="(-1)*(xtrs*1.5)" Y="0" Z="0"/>
+												<point X="0" Y="0" Z="(xtrs*1.5)"/>
+											</translate>
+											<set tgt="scl" exp="0.08"/>
+											<scale  X="scl*1.3" Y="scl*1.3" Z="scl*1.3" />
+											<set tgt="minRads" exp="5"/>
+											<rand tgt="zscl"/>
+											<group>
+												<scale  X="0.2" Y="0.2" Z="0.2" />
+												<models>
+													<model file="sphere.3d" R="0.4" G="0.4" B="0.4"/>
+												</models>
+											</group>
+										</group>
+									</then>
+								</if>
+							</then>
+						</if>
+					</while>
+				</group>
+			</group>
+
+			<!-- Saturn -->
+			<group>
+				<rotate angle="satRot" axisX="1"/>
+				<translate time="520">
+					<point X="399.000000" Y="0" Z="0"/>
+					<point X="199.500000" Y="0" Z="-460.725515"/>
+					<point X="0" Y="0" Z="-532.000000"/>
+					<point X="-199.500000" Y="0" Z="-460.725515"/>
+					<point X="-399.000000" Y="0" Z="0"/>
+					<point X="-199.500000" Y="0" Z="460.725515"/>
+					<point X="0" Y="0" Z="532.000000"/>
+					<point X="199.500000" Y="0" Z="460.725515"/>
+				</translate>
+				<scale X="0.1836" Y="0.1836" Z="0.1836" />
+				<models>
+					<model file="sphere.3d" R="0.74" G="0.73" B="0.42" />
+				</models>
+				<group>
+					<rotate angle="90*xtrs" axisY="0" axisX="1" axisZ="0" />
+					<scale X="3.5" Y="0.1" Z="3.5" />
+					<models>
+						<model file="torus.3d" R="0.96" G="0.87" B="0.7" />
+					</models>
+				</group>
+			</group>
+
+			<!-- Uranus -->
+			<group>
+				<rotate angle="urnRot" axisX="1"/>
+				<translate time="600">
+					<point X="515.497498" Y="0" Z="0"/>
+					<point X="257.748749" Y="0" Z="-595.245275"/>
+					<point X="0" Y="0" Z="-687.330017"/>
+					<point X="-257.748749" Y="0" Z="-595.245275"/>
+					<point X="-515.497498" Y="0" Z="0"/>
+					<point X="-257.748749" Y="0" Z="595.245275"/>
+					<point X="0" Y="0" Z="687.330017"/>
+					<point X="257.748749" Y="0" Z="595.245275"/>
+				</translate>
+				<scale X="0.1365" Y="0.1365" Z="0.1365" />
+				<models>
+					<model file="sphere.3d" R="0.0" G="0.36" B="1.0" />
+				</models>
+				<group>
+					<rotate angle="180*xtrs" axisY="0" axisX="1" axisZ="0" />
+					<scale X="3.0" Y="0.1" Z="3.0" />
+					<models>
+						<model file="torus.3d" R="0.69" G="0.88" B="0.9" />
+					</models>
+				</group>
+			</group>
+
+			<!-- Neptune -->
+			<group>
+				<rotate angle="nepRot" axisX="1"/>
+				<translate time="570">
+					<point X="582.022522" Y="0" Z="0"/>
+					<point X="291.011261" Y="0" Z="-672.061730"/>
+					<point X="0" Y="0" Z="-776.030029"/>
+					<point X="-291.011261" Y="0" Z="-672.061730"/>
+					<point X="-582.022522" Y="0" Z="0"/>
+					<point X="-291.011261" Y="0" Z="672.061730"/>
+					<point X="0" Y="0" Z="776.030029"/>
+					<point X="291.011261" Y="0" Z="672.061730"/>
+				</translate>
+				<scale X="0.1354" Y="0.1354" Z="0.1354" />
+				<models>
+					<model file="sphere.3d" R="0.0" G="0.0" B="0.8" />
+				</models>
+			</group>
+
+			<!-- Pluto -->
+			<group>
+				<rotate angle="pluRot" axisX="1"/>
+				<translate time="600">
+					<point X="686.392517" Y="0" Z="0"/>
+					<point X="343.196259" Y="0" Z="-792.577796"/>
+					<point X="0" Y="0" Z="-915.190002"/>
+					<point X="-343.196259" Y="0" Z="-792.577796"/>
+					<point X="-686.392517" Y="0" Z="0"/>
+					<point X="-343.196259" Y="0" Z="792.577796"/>
+					<point X="0" Y="0" Z="915.190002"/>
+					<point X="343.196259" Y="0" Z="792.577796"/>
+				</translate>
+				<scale X="0.017" Y="0.017" Z="0.017" />
+				<models>
+					<model file="sphere.3d" R="0.8" G="0.8" B="0.8" />
+				</models>
+			</group>
+		</group>
+	</group>
+</scene>
