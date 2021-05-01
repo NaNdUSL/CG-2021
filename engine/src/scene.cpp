@@ -21,6 +21,8 @@ class Scene{
 		int oAxisDr = 100;
 		// cameraCenter Axis
 		int ccAxisDr = 0;
+		// draw Transforms
+		int drawTrans = 0;
 		
 		// if the animation controls
 		int speedUp = 1;
@@ -37,7 +39,7 @@ class Scene{
 			int elapsed = ((now - lastMeasure)*speedUp*notPause);
 			lastMeasure = now; 
 			for (Group g: (*groups)){
-				g.makeGroup(elapsed);
+				g.makeGroup(elapsed, drawTrans);
 			}
 		}
 
@@ -126,6 +128,10 @@ class Scene{
 
 				case 'j':
 				notPause = !(notPause);
+				break;
+
+				case 'u':
+				drawTrans = !(drawTrans);
 				break;
 
 				default:

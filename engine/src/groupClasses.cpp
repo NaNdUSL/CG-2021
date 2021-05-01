@@ -7,7 +7,11 @@ class Transform{
 		}
 
 
-		virtual void applyTransform(int timeDelta) = 0;
+		virtual void applyTransform(int timeDelta, int toDraw) = 0;
+
+		void draw(){
+			return;
+		}
 };
 
 
@@ -19,7 +23,7 @@ class Rotate : public Transform{
 			this->degrees = angle;
 		}
 
-		void applyTransform(int timeDelta){
+		void applyTransform(int timeDelta, int toDraw){
 			glRotatef(degrees,axis[0],axis[1],axis[2]);
 		}
 };
@@ -30,7 +34,7 @@ class Translate : public Transform{
 		Translate(std::vector<float> vals):Transform(vals){	
 		}
 
-		void applyTransform(int timeDelta){
+		void applyTransform(int timeDelta, int toDraw){
 			glTranslatef(axis[0],axis[1],axis[2]);
 		}
 };
@@ -41,7 +45,7 @@ class Scale : public Transform{
 		Scale(std::vector<float> vals):Transform(vals){	
 		}
 
-		void applyTransform(int timeDelta){
+		void applyTransform(int timeDelta, int toDraw){
 			glScalef(axis[0],axis[1],axis[2]);
 		}	
 };
@@ -64,7 +68,7 @@ class TimedRotation : public Transform{
 			degrees += (360/timeToCycle)* ((float) timeDelta); // depende da unidade de timeToCycle
 		}
 
-		void applyTransform(int timeDelta){
+		void applyTransform(int timeDelta, int toDraw){
 			currAngle(timeDelta);
 			glRotatef(degrees,axis[0],axis[1],axis[2]);
 		}
@@ -77,13 +81,17 @@ class CatmullTranslate : public Transform{
 		float lastPoint = 0.0f;
 		float timeToCycle;
 		std::vector<float> point;
+		std::vector<float> deriv;
+		float rot[4][4];
+		std::vector<float> lastY = {0,1,0,0};
+		std::vector<float> lastX = {0,0,0,0};
+		std::vector<float> lastZ = {0,0,0,0};
 
 		CatmullTranslate(float time,std::vector<float> controlPts):Transform(controlPts){
 			timeToCycle = time*1000;
 			if (timeToCycle <= 0) timeToCycle = 1000;
 
 		}
-
 
 
 		void matDotVec(std::vector<std::vector<float>> mat, std::vector<float> vec, std::vector<float>*res){
@@ -96,11 +104,71 @@ class CatmullTranslate : public Transform{
 			}
 		}
 
+		
+		
+		void getRotationMat(){
+			normalize(deriv);
+			normalize(lastY);
+			lastZ = crossProd(deriv,lastY);
+			lastY = crossProd(lastZ,deriv);
+			rot[0][0] = deriv[0]; rot[0][1] = lastY[0]; rot[0][2] = lastZ[0]; rot[0][3] =        0;  
+			rot[1][0] = deriv[1]; rot[1][1] = lastY[1]; rot[1][2] = lastZ[1]; rot[1][3] =        0;
+			rot[2][0] = deriv[2]; rot[2][1] = lastY[2]; rot[2][2] = lastZ[2]; rot[2][3] =        0;
+			rot[3][0] =        0; rot[3][1] =        0; rot[3][2] =        0; rot[3][3] =        1;
+		}
+
+
 		void currPoint(int timeDelta){
 			float offset = (float) timeDelta/timeToCycle;
 			lastPoint += offset;
 
 			float t = lastPoint * (float)(axis.size()/3);
+			std::vector<float> vec = getPointCurve(t,1);
+			point.clear();
+
+
+			for (int i=0; i<vec.size(); i++)
+        		point.push_back(vec[i]);
+		}
+
+
+		float invSqrt(float number){
+			long i;
+			float x2, y;
+			const float threehalfs = 1.5F;
+		
+			x2 = number * 0.5F;
+			y  = number;
+			i  = * (long *) &y;
+			i  = 0x5f3759df - (i >> 1);
+			y  = * (float *) &i;
+			y  = y * (threehalfs - (x2 * y * y));		
+			return y;
+		}
+
+		void normalize(std::vector<float> &retVec){
+			float value = invSqrt((retVec[0]*retVec[0]) + (retVec[1]*retVec[1]) + (retVec[2]*retVec[2]));
+			retVec[0] = retVec[0] * value;
+			retVec[1] = retVec[1] * value;
+			retVec[2] = retVec[2] * value;
+		}
+
+
+		std::vector<float> crossProd(std::vector<float> a, std::vector<float> b){
+			std::vector<float> res;
+			res.push_back(a[1]*b[2] - a[2]*b[1]);
+			res.push_back(a[2]*b[0] - a[0]*b[2]);
+			res.push_back(a[0]*b[1] - a[1]*b[0]);
+			normalize(res);
+
+			return res;
+		}
+
+
+
+
+
+		std::vector<float> getPointCurve(float t, int rot=0){
 			int index = floor(t);
 			t = t - index;
 
@@ -117,7 +185,7 @@ class CatmullTranslate : public Transform{
 			std::vector<float> p3 = { axis[(indices[3]*3)],axis[(indices[3]*3)+1],axis[(indices[3]*3)+2],1.0f };
 			
 
-			
+			std::vector<float> res;
 
 			std::vector<std::vector<float>>catmullM = {
 				{-0.5f,  1.5f, -1.5f,  0.5f},
@@ -128,23 +196,49 @@ class CatmullTranslate : public Transform{
 
 			std::vector<std::vector<float>> a;
 			std::vector<float> T = { (float)pow(t,3),(float)pow(t,2),t,1 };
+			std::vector<float> Tlinha = { 3*(float)(pow(t,2)), 2*t, 1, 0 };
 			for (int i = 0;  i < 4; i++){
 				a.push_back({0});
 				std::vector<float> p = { p0[i],p1[i],p2[i],p3[i] };
 				
 				matDotVec(catmullM, p, &a[i]);
-				//printf("%f %f %f\n", a[i][0],a[i][1],a[i][2]);
 			}
 
-			point.clear();
-			matDotVec(a,T,&point);
+			res.clear();
+			matDotVec(a,T,&res); // 
+
+			if (rot){
+				matDotVec(a,Tlinha,&deriv);
+			}
+			return res;
 		}
 
-		void applyTransform(int timeDelta){
+
+		void applyTransform(int timeDelta, int toDraw){
+			if (toDraw)	{
+				this->draw();
+			}
+
 			currPoint(timeDelta);
-			//printf("%f %f %f\n", point[0],point[1],point[2]);
+			getRotationMat();
 			glTranslatef(point[0],point[1],point[2]);
+			glMultMatrixf(&rot[0][0]);
 		}
+
+		void draw(){
+			float tesselation = 0.01f;
+			float k;
+
+			glBegin(GL_LINE_LOOP);
+			glColor3f(1.0f, 1.0f, 1.0f);
+			for (float i = 0; i < 1; i= i + tesselation){
+				k = i * (float)(axis.size()/3);
+				std::vector<float> vec = getPointCurve(k);	
+				glVertex3f(vec[0], vec[1], vec[2]);
+			}
+			glEnd();
+		}
+
 };
 
 
@@ -160,17 +254,17 @@ class Group{
 
 		int flagTRI = 0;
 	
-		void applyTransforms(int timeDelta){
+		void applyTransform(int timeDelta, int toDraw){
 			for (Transform*t: trans){
-				t->applyTransform(timeDelta);
+				t->applyTransform(timeDelta, toDraw);
 			}
 		}
 		
-		void makeGroup(int timeDelta){
+		void makeGroup(int timeDelta, int toDraw){
 			glPushMatrix();
 
 
-			applyTransforms(timeDelta);
+			applyTransform(timeDelta, toDraw);
 			for (std::pair<std::vector<float>,Model*> m: models){
 				glColor3f(m.first[0],m.first[1],m.first[2]);
 				if (flagTRI) m.second->drawT();
@@ -178,11 +272,10 @@ class Group{
 			}
 	
 			for (Group grp: child){
-				grp.makeGroup(timeDelta);
+				grp.makeGroup(timeDelta, toDraw);
 			}
 	
 			glPopMatrix();
 		}
 };
-
 
