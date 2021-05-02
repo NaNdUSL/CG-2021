@@ -9,9 +9,9 @@
 	</settings>
 
 	<group>
-		<scale X="3" Y="3" Z="3" />
+		<scale X="20" Y="20" Z="20" />
 		<models>
-			<model file="terreno.3d" hmap="terreno.jpg" R="1" G="1" B="1"/>
+			<model file="terrenao.3d" hmap="testeD.jpg" R="1" G="1" B="1" I="0.2"/>
 		</models>
 	</group>
 </scene>

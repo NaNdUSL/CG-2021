@@ -24,6 +24,31 @@
 
 	<group>
 
+		<!-- Comet -->
+		<group>
+ 			<scale X="0.6" Y="0.6" Z="0.6" />
+ 			<rotate angle="69" axisX="1" axisZ="0"/>
+
+			<translate time="200">
+				<point Y="150.000000" Z="0" X="0"/>
+				<point Y="75.000000" Z="0" X="-173.205081"/>
+				<point Y="0" Z="0" X="-200.000000"/>
+				<point Y="-75.000000" Z="0" X="-173.205081"/>
+				<point Y="-150.000000" Z="0" X="0"/>
+				<point Y="-75.000000" Z="0" X="173.205081"/>
+				<point Y="0" Z="0" X="200.000000"/>
+				<point Y="75.000000" Z="0" X="173.205081"/> 
+			</translate>
+
+			<group>
+				<group>
+					<scale X="0.3" Y="0.3" Z="0.3" />
+					<models>
+						<model file="teap.3d" R="0.86" G="0.4" B="0.6" />
+					</models>
+				</group>
+			</group>
+		</group>
 		<!-- sun -->
 		<group>
 			<scale X="0.6" Y="0.6" Z="0.6" />
@@ -78,7 +103,7 @@
 			<!-- Earth -->
 			<group>
 				<rotate angle="earRot" axisX="1"/>
-				<translate time="500">
+				<translate time="50">
 					<point X="53.955002" Y="0" Z="0"/>
 					<point X="26.977501" Y="0" Z="-62.301870"/>
 					<point X="0" Y="0" Z="-71.940002"/>
@@ -188,24 +213,7 @@
 				</while>
 			</group>
 
-			<!-- Comet -->
-			<group>
-				<rotate angle="comRot" axisX="1" axisZ="1"/>
-				<translate time="200">
-					<point X="150.000000" Y="0" Z="0"/>
-					<point X="75.000000" Y="0" Z="-173.205081"/>
-					<point X="0" Y="0" Z="-200.000000"/>
-					<point X="-75.000000" Y="0" Z="-173.205081"/>
-					<point X="-150.000000" Y="0" Z="0"/>
-					<point X="-75.000000" Y="0" Z="173.205081"/>
-					<point X="0" Y="0" Z="200.000000"/>
-					<point X="75.000000" Y="0" Z="173.205081"/> 
-				</translate>
-				<scale X="0.3" Y="0.3" Z="0.3" />
-					<models>
-						<model file="teap.3d" R="0.86" G="0.4" B="0.6" />
-					</models>
-			</group>
+
 
 			<!-- Jupiter -->
 			<group>
@@ -293,7 +301,7 @@
 					</models>
 				</group>
 				<group>
-					<rotate angle="90*xtrs" axisY="0" axisX="1" axisZ="0" />
+					<!-- <rotate angle="90*xtrs" axisY="0" axisX="1" axisZ="0" /> -->
 					<scale X="3.5" Y="0.1" Z="3.5" />
 					<models>
 						<model file="torus.3d" R="0.96" G="0.87" B="0.7" />
