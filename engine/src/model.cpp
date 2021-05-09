@@ -65,7 +65,7 @@ class Model{
 
 		for(int i = 0; i < 3*numFaces; i++){
 			mod >> auxi;
-			facesList.push_back(auxi-1);
+			facesList.push_back(auxi);
 		}
 		mod.close();
 	}

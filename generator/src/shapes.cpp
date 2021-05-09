@@ -6,8 +6,13 @@ class Mesh{
 		
 		// - variáveis de instância
 		std::vector<std::vector<int>> planar; 
-		std::vector<std::vector<float>> vertex;
+		std::vector<float> vertexDescriptor; // posititon[3],UV[3],normal[3]
+
 		std::vector<int> faces;
+		std::map<int, std::vector<std::vector<float>>> UVs;
+		std::map<int, std::vector<float>> position;
+		std::map<int, std::vector<std::vector<float>>> normals;
+
 		int facs,vex;
 		const char* fileName;
 
@@ -16,7 +21,7 @@ class Mesh{
 		
 		// - Construtor :: recebe o nome do ficheiro onde o shape será escrito
 		Mesh(const char* file){
-			
+			this->vex = 0;
 			this->fileName = file;
 		}
 
@@ -39,6 +44,7 @@ class Mesh{
 			*/
 		void trisPolyLine(){
 			int t = 0;
+			this->vex = 0;
 			int lins,cols;
 			lins = (int)(planar.size());
 			cols = (int)(planar[0].size());
@@ -49,23 +55,55 @@ class Mesh{
 					int p = (h+1)%(cols);
 
 					if ((planar[i][h] > 0 && planar[i-1][h]> 0 && planar[i-1][p]> 0)    &&  (planar[i][h] != planar[i-1][h]) && (planar[i][h] != planar[i-1][p]) && (planar[i-1][h]!= planar[i-1][p])){
-						faces.push_back(planar[i][h]);
-						faces.push_back(planar[i-1][h]);
-						faces.push_back(planar[i-1][p]);
+						faces.push_back(checkVertexProfile(planar[i][h]));
+						faces.push_back(checkVertexProfile(planar[i-1][h]));
+						faces.push_back(checkVertexProfile(planar[i-1][p]));
 						t++;
 					}
 					
 					if ((planar[i][h] > 0 && planar[i-1][p] > 0 && planar[i][p] > 0)   &&  (planar[i][h] != planar[i-1][p]) && (planar[i][h] != planar[i][p]) && (planar[i-1][p]!= planar[i][p])){
-						faces.push_back(planar[i][h]);
-						faces.push_back(planar[i-1][p]);
-						faces.push_back(planar[i][p]);
+						faces.push_back(checkVertexProfile(planar[i][h]));
+						faces.push_back(checkVertexProfile(planar[i-1][p]));
+						faces.push_back(checkVertexProfile(planar[i][p]));
 						t++;
 					}
 				}
 			}
 
 			this -> facs = t;
+		}
 
+
+		int checkVertexProfile(int vx){
+			//printf("%d\n",vx );
+			std::vector<float> pos = position[vx];
+			
+			
+			std::vector<float> uvCoord = UVs[vx][0];
+			if (UVs[vx].size() > 1) UVs[vx].erase(UVs[vx].begin());
+
+			std::vector<float> normal = normals[vx][0];
+			if (normals[vx].size() > 1) normals[vx].erase(normals[vx].begin());
+
+			for (float i:pos){
+				vertexDescriptor.push_back(i);
+			}
+
+			
+			for (float i:uvCoord){
+				vertexDescriptor.push_back(i);
+			}
+			for (float i:normal){
+				vertexDescriptor.push_back(i);
+			}
+			return vex++;
+		}
+
+
+		void insertIfMissing(std::map<int, std::vector<std::vector<float>>> m,int key){
+			if ( m.find(key) == m.end() ) {
+				m[key] = std::vector<std::vector<float>>();
+			}
 		}
 
 
@@ -77,10 +115,8 @@ class Mesh{
 
 			File2Wr << vex << "\n" << facs <<"\n";
 
-			for (std::vector<float> &v : this->vertex){
-				for (float &point : v){
-					File2Wr << point << "\n";
-				}
+			for (float point : this->vertexDescriptor){
+				File2Wr << point << "\n";
 			}
 			for (int face:faces){
 				File2Wr << face << "\n";
@@ -97,6 +133,29 @@ class Mesh{
 			this->trisPolyLine();
 
 			this->write3DFile();
+		}
+
+
+		float invSqrt(float number){
+			long i;
+			float x2, y;
+			const float threehalfs = 1.5F;
+
+			x2 = number * 0.5F;
+			y  = number;
+			i  = * (long *) &y;
+			i  = 0x5f3759df - (i >> 1);
+			y  = * (float *) &i;
+			y  = y * (threehalfs - (x2 * y * y));
+			return y;
+		}
+		
+		// Método que normaliza o vetor
+		void normalize(float x, float y, float z, std::vector<float> &retVec){
+			float value = invSqrt((x*x) + (y*y) + (z*z));
+			retVec[0] = x * value;
+			retVec[1] = y * value;
+			retVec[2] = z * value;
 		}
 };
 
@@ -122,7 +181,6 @@ class Sphere : public Mesh{
 			this->radius = radius;
 			this->stacks = stacks;
 			this->slices = slices;
-			this->vex = (slices*stacks) + 2;
 		}
 
 		void shape(){
@@ -131,22 +189,53 @@ class Sphere : public Mesh{
 			float freqbet = (M_PI)/(stacks+1);
 			int vtxPts = 1;
 
+			float uFreq = 1/(float)(slices-1);
+			float vFreq = 1/(float)(stacks+1);
+
 			std::vector<int> row;
 
-			for (int st = 0; st < stacks+2; st++){
+			int st;
+			int sl;
+			for (st = 0; st < stacks+2; st++){
 				row.clear();
-				for (int sl = 0; sl < slices; sl++){
-					if (!(st == 0 || st == stacks+1) || sl == slices-1){
+				for (sl = 0; sl < slices; sl++){
 						std::vector<float> aux;
+						std::vector<float> auxN{0,0,0};
 						aux.push_back((cos(freqbet*st - (M_PI/2))*radius)*sin(freqalf*sl));
 						aux.push_back((float)radius*sin(freqbet*st - (M_PI/2)));
 						aux.push_back((cos(freqbet*st - (M_PI/2))*radius)*cos(freqalf*sl));
-						(this->vertex).push_back(aux);
-						row.push_back(vtxPts++);
-					}
+						
+						(this->position).insert({vtxPts,aux});
+						normalize(aux[0],aux[1],aux[2],auxN);
+						
+/*						printf("%f, %f, %f\n", auxN[0], auxN[1], auxN[2]);
+						printf("%f, %f, %f\n", aux[0], aux[1], aux[2]);*/
 
-					else row.push_back(vtxPts);
- 
+						insertIfMissing(this->UVs,vtxPts);
+						insertIfMissing(this->normals,vtxPts);
+						this->normals[vtxPts].push_back(auxN);
+						
+
+						if(sl==0 && st>0 && st<stacks+1){
+							std::vector<float> auxUVA{0.0f,(float)st * (vFreq)};
+							std::vector<float> auxUVB{1.0f,(float)st * (vFreq)};
+							this->UVs[vtxPts].push_back(auxUVA);
+							this->UVs[vtxPts].push_back(auxUVB);
+							this->UVs[vtxPts].push_back(auxUVB);
+							this->UVs[vtxPts].push_back(auxUVA);
+							this->UVs[vtxPts].push_back(auxUVA);
+							this->UVs[vtxPts].push_back(auxUVB);
+						}
+
+						else{
+							std::vector<float> auxUV{(float) sl* (uFreq),(float)st * (vFreq)};
+							//std::vector<float> auxUV{420,69};
+
+							this->UVs[vtxPts].push_back(auxUV);
+						}
+
+						row.push_back(vtxPts);
+						if (!(st == 0 || st == stacks+1) || sl == slices-1) vtxPts++;
 				}
 				(this->planar).push_back(row);
 			}
@@ -182,22 +271,61 @@ class Cone : public Sphere{
 			std::vector<int> row;
 			std::vector<float> aux;
 
+			float uFreq = 1/(float)(slices-1);
+			float vFreq = 1/(float)(stacks+1);
+
 			for (int st = 0; st <= stacks+1; st++){
 				row.clear();
 				for (int sl = 0; sl < slices; sl++){
-					if (!(st == 0 || st == stacks+1) || sl == slices-1){
 						aux.clear();
+						std::vector<float> auxN{0,0,0};
 						inv = (stacks+1 - st)%(stacks+1);
 						aux.push_back((rat*inv)*sin(freq*sl));
 						aux.push_back((-(height))/2 +(heiStck)*(st-1));                   
 						aux.push_back((rat*inv)*cos(freq*sl));
 						
-						if (st == 0)aux[1] =(-(height))/2;
 
-						(this->vertex).push_back(aux);
-						row.push_back(vtxPts++);
-					}
-					else row.push_back(vtxPts);
+						normalize(height*sin(freq*sl), radius , height*cos(freq*sl),auxN);
+
+						insertIfMissing(this->UVs,vtxPts);
+						insertIfMissing(this->normals,vtxPts);
+						
+						if (st == 0){
+							aux[1] =(-(height))/2;
+							auxN[0] = 0;
+							auxN[1] = -1;
+							auxN[2] = 0;
+						}
+
+						(this->position).insert({vtxPts,aux});
+
+						if (st == 1){
+							std::vector<float> auxNA{0,-1,0};
+							this->normals[vtxPts].push_back(auxNA);
+							this->normals[vtxPts].push_back(auxNA);
+						}
+
+						this->normals[vtxPts].push_back(auxN);
+
+						if(sl==0 && st>0 && st<stacks+1){
+							std::vector<float> auxUVA{0.0f,(float)st * (vFreq)};
+							std::vector<float> auxUVB{1.0f,(float)st * (vFreq)};
+							this->UVs[vtxPts].push_back(auxUVA);
+							this->UVs[vtxPts].push_back(auxUVB);
+							this->UVs[vtxPts].push_back(auxUVB);
+							this->UVs[vtxPts].push_back(auxUVA);
+							this->UVs[vtxPts].push_back(auxUVA);
+							this->UVs[vtxPts].push_back(auxUVB);
+						}
+
+						else{
+							std::vector<float> auxUV{(float) sl* (uFreq),(float)st * (vFreq)};
+							this->UVs[vtxPts].push_back(auxUV);
+						}
+
+
+						row.push_back(vtxPts);
+						if (!(st == 0 || st == stacks+1) || sl == slices-1) vtxPts++;
 					
 				}
 				(this->planar).push_back(row);
@@ -221,14 +349,14 @@ class Cone : public Sphere{
 
 class Plane: public Mesh{
 	public:
-		float xDim, zDim;
+		float xDim, zDim, initU, initV, maxU, maxV;
 		int xSlc, zSlc;
 		float xAng = 0;
 		float zAng = 0;
 		std::vector<float> orig;
 
 		
-		Plane(float xDim, float zDim, int xSlc, int zSlc,const char* fileName,std::vector<float> orig = {0,0,0}, float xAng = 0, float zAng = 0): Mesh(fileName){
+		Plane(float xDim, float zDim, int xSlc, int zSlc,const char* fileName,std::vector<float> orig = {0,0,0}, float xAng = 0, float zAng = 0, float initU = 0, float initV= 0, float maxU = 1, float maxV= 1): Mesh(fileName){
 			(this->xDim) = xDim;
 			(this->zDim) = zDim;
 			(this->xSlc) = xSlc;
@@ -238,7 +366,10 @@ class Plane: public Mesh{
 			(this->xAng) = xAng;
 			(this->orig) = orig;
 
-			(this->vex) = (xSlc+1)*(zSlc+1);
+			this ->initU = initU;
+			this ->initV = initV;
+			this ->maxU =  maxU;
+			this ->maxV =  maxV;
 		}
 
 		
@@ -251,20 +382,44 @@ class Plane: public Mesh{
 			std::vector<float> aux;
 			std::vector<int> row;
 
+			float uFreq = (maxU - initU)/(float)(xSlc);
+			float vFreq = (maxV - initV)/(float)(zSlc);
+
 			for (int x = 0;  x < xSlc+1; x++){
 				row.clear();
 				for (int z = 0; z < zSlc+1; z++){
 					aux.clear();
 					rots.clear();
+					insertIfMissing(this->UVs,vtxPts);
+					insertIfMissing(this->normals,vtxPts);
+
+					std::vector<float> auxUV{( (float)x * (uFreq)) + initU, ((float)z *(vFreq)) + initV};
+					//printf("%f\n", uFreq);
+					//printf("%f\n", ( (float)x * (uFreq)) + initU);
+					//printf("%f\n", ((float)z *(vFreq)) + initV);
+
+
+					this->UVs[vtxPts].push_back(auxUV);
+
+
 					//gera o ponto
 					aux.push_back((-(xDim)/2) + x*xRatio);
 					aux.push_back(0);
 					aux.push_back((-(zDim)/2) + z*zRatio);
 					
+					std::vector<float> auxN{0,1,0};
+					std::vector<float> rotsN;
+
+
 					//rotate xAx
 					rots.push_back(aux[0]);
 					rots.push_back(-aux[2]*sin(xAng));
 					rots.push_back(aux[2]*cos(xAng));
+
+					rotsN.push_back(0);
+					rotsN.push_back(cos(xAng));
+					rotsN.push_back(sin(xAng));
+
 					
 		
 					//rotate zAx
@@ -272,12 +427,19 @@ class Plane: public Mesh{
 					aux[1] = rots[0]*sin(zAng) + rots[1]*cos(zAng);
 					aux[2] = rots[2];
 
+					//rotate zAx
+					auxN[0] = rotsN[0]*cos(zAng) - rotsN[1]*sin(zAng);
+					auxN[1] = rotsN[0]*sin(zAng) + rotsN[1]*cos(zAng);
+					auxN[2] = rotsN[2];					
+
+
 					//translada para centrar na origem desejada
 					aux[0] += orig[0];
 					aux[1] += orig[1];
 					aux[2] += orig[2];
 					
-					(this->vertex).push_back(aux);
+					this->normals[vtxPts].push_back(auxN);
+					(this->position).insert({vtxPts,aux});
 					row.push_back(vtxPts++);	
 				}
 				row.push_back(-1);
@@ -305,7 +467,6 @@ class Box : public Mesh{
 		std::vector<Plane> planeFaces;
 
 		Box(float xDim, float yDim, float zDim,int slicesX, int slicesY, int slicesZ,const char* fileName): Mesh(fileName){
-			(this->vex) = 2*(slicesX+1)*(slicesZ+1) + 2*(slicesX+1)*(slicesY+1) + 2*(slicesY+1)*(slicesZ+1);
 			(this->xDim) = xDim;
 			(this->yDim) = yDim;
 			(this->zDim) = zDim;
@@ -315,14 +476,14 @@ class Box : public Mesh{
 		}
 
 		void shape(){
-			planeFaces.push_back(Plane(yDim,zDim,slicesY,slicesZ,"",{xDim/2,0,0},0,-M_PI/2));
-			planeFaces.push_back(Plane(yDim,zDim,slicesY,slicesZ,"",{-xDim/2,0,0},0,M_PI/2));
+			planeFaces.push_back(Plane(yDim,zDim,slicesY,slicesZ,"",{xDim/2,0,0},0,-M_PI/2,0,0,(float)1/3,(float)1/3));
+			planeFaces.push_back(Plane(yDim,zDim,slicesY,slicesZ,"",{-xDim/2,0,0},0,M_PI/2,(float)1/3,0,(float)2/3,(float)1/3));
 			
-			planeFaces.push_back(Plane(xDim,zDim,slicesX,slicesZ,"",{0,yDim/2,0},0,0));
-			planeFaces.push_back(Plane(xDim,zDim,slicesX,slicesZ,"",{0,-yDim/2,0},0,M_PI));
+			planeFaces.push_back(Plane(xDim,zDim,slicesX,slicesZ,"",{0,yDim/2,0},0,0,0,(float)1/3,(float)1/3,(float)2/3));
+			planeFaces.push_back(Plane(xDim,zDim,slicesX,slicesZ,"",{0,-yDim/2,0},0,M_PI,(float)1/3,(float)1/3,(float)2/3,(float)2/3));
 
-			planeFaces.push_back(Plane(xDim,yDim,slicesX,slicesY,"",{0,0,zDim/2},M_PI/2,0));
-			planeFaces.push_back(Plane(xDim,yDim,slicesX,slicesY,"",{0,0,-zDim/2},-M_PI/2,0));
+			planeFaces.push_back(Plane(xDim,yDim,slicesX,slicesY,"",{0,0,zDim/2},M_PI/2,0,0,(float)2/3,(float)1/3,1));
+			planeFaces.push_back(Plane(xDim,yDim,slicesX,slicesY,"",{0,0,-zDim/2},-M_PI/2,0,(float)1/3,(float)2/3,(float)2/3,1));
 			
 			this->unifyFaces();
 		}
@@ -333,8 +494,8 @@ class Box : public Mesh{
 			for (Plane p : (this->planeFaces)){
 				p.shape();
 				p.trisPolyLine();
-				for (std::vector<float> vtx : p.vertex){
-					(this -> vertex).push_back(vtx);
+				for (float vtx : p.vertexDescriptor){
+					(this -> vertexDescriptor ).push_back(vtx);
 				}
 
 				for(int vertexRef: p.faces){
@@ -344,6 +505,8 @@ class Box : public Mesh{
 				front += p.vex;
 				(this->facs) += p.facs;
 			}
+
+			this->vex = front;
 		}
 
 		void build(){
@@ -367,7 +530,6 @@ class Cylinder : public Cone{
 	public:
 
 		Cylinder(float radius, float height, int slices, int stacks,const char* fileName):Cone(radius,height,slices, stacks,fileName){
-			this->vex = (slices*(stacks+1)) + 2;
 		}
 
 		void shape(){	
@@ -375,37 +537,90 @@ class Cylinder : public Cone{
 			float heiStck = height/(stacks);
 			float freq = (2*M_PI)/slices;
 			
+			float uFreq = 1/(float)(slices-1);
+			float vFreq = 1/(float)(stacks+1);
+			
 			std::vector<int> row;
 			std::vector<float> aux;
+
+			std::vector<float> auxN{0,0,0};
 
 			for (int st = 0; st <= stacks+2; st++){
 				row.clear();
 				for (int sl = 0; sl < slices; sl++){
 					aux.clear();
+
+					insertIfMissing(this->UVs,vtxPts);
+					insertIfMissing(this->normals,vtxPts);
 					if ( st > 0 && st < stacks+2) {
 						aux.push_back(radius*sin(freq*sl));
 						aux.push_back((-(height))/2 +(heiStck)*(st-1));                   
 						aux.push_back(radius*cos(freq*sl));
-						
-						(this->vertex).push_back(aux);
-						vtxPts++;
 					}
 
-					else if (st == 0 && sl == slices-1){
+					else if (st == 0){
 						aux.push_back(0);
 						aux.push_back((-(height))/2);
 						aux.push_back(0);
-						(this->vertex).push_back(aux);
 					} 
 						
-					else if (st == stacks+2 && sl == 0){
+					else if (st == stacks+2){
 						aux.push_back(0);
 						aux.push_back((height)/2);
 						aux.push_back(0);
-						vtxPts++;
-						(this->vertex).push_back(aux);
 					}	
-					row.push_back(vtxPts);			
+					
+
+					if (st>1 && st<stacks+1){
+						normalize(aux[0],0,aux[2],auxN);
+					}
+
+					
+					if (st == 1){
+						std::vector<float> auxNA{0,-1,0};
+						normalize(aux[0],0,aux[2],auxN);
+						this->normals[vtxPts].push_back(auxNA);
+						this->normals[vtxPts].push_back(auxNA);
+					}
+
+
+					if (st == stacks+1){
+						std::vector<float> auxNA{0,1,0};
+						this->normals[vtxPts].push_back(auxNA);
+						this->normals[vtxPts].push_back(auxNA);
+					}
+
+
+					if(st == 0  || st == stacks+2){
+						auxN[0] = 0;
+						auxN[1] = (2)*(st%(stacks+1)) - 1;
+						auxN[2] = 0;
+					}
+
+					this->normals[vtxPts].push_back(auxN);
+
+					if(sl==0 && st>0 && st<stacks+1){
+						std::vector<float> auxUVA{0.0f,(float)st * (vFreq)};
+						std::vector<float> auxUVB{1.0f,(float)st * (vFreq)};
+						this->UVs[vtxPts].push_back(auxUVA);
+						this->UVs[vtxPts].push_back(auxUVB);
+						this->UVs[vtxPts].push_back(auxUVB);
+						this->UVs[vtxPts].push_back(auxUVA);
+						this->UVs[vtxPts].push_back(auxUVA);
+						this->UVs[vtxPts].push_back(auxUVB);
+					}
+
+					else{
+						std::vector<float> auxUV{(float) sl* (uFreq),(float)st * (vFreq)};
+						this->UVs[vtxPts].push_back(auxUV);
+					}
+
+					(this->position).insert({vtxPts,aux});
+					row.push_back(vtxPts);
+					
+					if (sl == slices-1 || (st > 0 && st < stacks+2)){
+						vtxPts++;
+					}			
 				}
 				(this->planar).push_back(row);
 			}
@@ -434,25 +649,76 @@ class Torus : public Mesh{
 			this->stacks = stacks;
 			this->intr = internRadius;
 			this->extr = externRadius;
+
+
 		}
 
 		void shape(){
+			float uFreq = 1/(float)(slices+1);
+			float vFreq = 1/(float)(stacks+1);
 			float alpha = (2*M_PI)/slices;
 			float beta = (2*M_PI)/(stacks-1);
-			  int vtxPts = 1;
+			int vtxPts = 1;
 
-			  std::vector<int> row;
 
-			  for (int st = 0; st < stacks+1; st++){
-				 row.clear();
+			std::vector<int> row;
+
+			for (int st = 0; st < stacks+1; st++){
+				row.clear();
 				for (int sl = 0; sl < slices+1; sl++){
-					if (vtxPts < this->vex){
+					insertIfMissing(this->UVs,vtxPts);
+					insertIfMissing(this->normals,vtxPts);
+					
+					if (sl == 0 && st > 0 && st < stacks){
+						std::vector<float> auxUVA{0.0f,(float)st * (vFreq)};
+						std::vector<float> auxUVB{1.0f,(float)st * (vFreq)};
+						this->UVs[vtxPts].push_back(auxUVA);
+						this->UVs[vtxPts].push_back(auxUVB);
+						this->UVs[vtxPts].push_back(auxUVB);
+						this->UVs[vtxPts].push_back(auxUVA);
+						this->UVs[vtxPts].push_back(auxUVA);
+						this->UVs[vtxPts].push_back(auxUVB);						
+					}
+
+					if (sl > 0 && st == 0){
+						std::vector<float> auxUVA{(float)sl * (uFreq), 0.0f};
+						std::vector<float> auxUVB{(float)sl * (uFreq), 1.0f};
+						this->UVs[vtxPts].push_back(auxUVA);
+						this->UVs[vtxPts].push_back(auxUVB);
+						this->UVs[vtxPts].push_back(auxUVB);
+						this->UVs[vtxPts].push_back(auxUVA);
+						this->UVs[vtxPts].push_back(auxUVA);
+						this->UVs[vtxPts].push_back(auxUVB);						
+					}
+
+					if (sl == 0 && st == 0){
+						std::vector<float> auxUVA{0.0f, 0.0f};
+						std::vector<float> auxUVB{1.0f, 1.0f};
+						this->UVs[vtxPts].push_back(auxUVA);
+						this->UVs[vtxPts].push_back(auxUVB);
+						this->UVs[vtxPts].push_back(auxUVB);
+						this->UVs[vtxPts].push_back(auxUVA);
+						this->UVs[vtxPts].push_back(auxUVA);
+						this->UVs[vtxPts].push_back(auxUVB);						
+					}
+
+					if (sl > 0 && st > 0 && st < stacks){
+						std::vector<float> auxUV{(float) sl* (uFreq),(float)st * (vFreq)};
+						this->UVs[vtxPts].push_back(auxUV);
+					}
+
+
+					if (st < stacks){
+						std::vector<float> auxN{0,0,0};
 						std::vector<float> aux;
 						aux.push_back(extr*(sin(alpha*sl)) + intr*sin(alpha*sl)*(cos(beta*st)));
 						aux.push_back(intr*(sin(beta*st)));
 						aux.push_back(extr*cos(alpha*sl) + intr*cos(alpha*sl)*cos(beta*st));
+
+						normalize(aux[0] - extr*(sin(alpha*sl)),aux[1], aux[2] - extr*cos(alpha*sl), auxN);
 						
-						(this->vertex).push_back(aux);
+						(this->position).insert({vtxPts,aux});
+						this->normals[vtxPts].push_back(auxN);
 						row.push_back(vtxPts++);
 					}
 
@@ -465,7 +731,7 @@ class Torus : public Mesh{
 				(this->planar).push_back(row);
 			}
 		}
-};
+	};
 
 
 
@@ -481,13 +747,11 @@ class Bezier : public Mesh{
 		int patcheNum = 0;
 		std::vector<std::vector<std::vector<float>>> curves;
 
-
 		Bezier(std::string fileName, int tesselation, const char* file):Mesh(file){
 			tessFact = 1.0f/((float) tesselation);
 			tesselationLv = tesselation;
 
 			readPatches(fileName);
-			this->vex = ((tesselation+1) * (tesselation+1))*patcheNum;
 		}
 
 		void readPatches(std::string fileName){
@@ -558,25 +822,71 @@ class Bezier : public Mesh{
 			float v = 0;
 			int vtxPts = 1;
 			std::vector<int> row;
-			
+
+			int UVFact = partitionUv(patcheNum);
+
+			float initU;
+			float initV;
+			float maxU;
+			float maxV;
+
+			float uFreq = (maxU - initU)/(float)(tesselation);
+			float vFreq = (maxV - initV)/(float)(tesselation);
+
 			for (int kk = 0; kk < patcheNum; kk++){
 				u = 0;
+				int aux = kk % (UVFact);
+
+				initU = (float)(aux) * (1/UVFact);
+				maxU = initU + UVFact;
+
+				aux = (aux/UVFact);
+				initV = (float)(aux)*(1/UVFact);
+				maxV = initV + UVFact;
+
+
 				std::vector<std::vector<float>> interCurve;
+				std::vector<std::vector<float>> interDerivU;
+
+
 				for (int i = 0; i <= tesselationLv; i++){
 					interCurve.clear();
+					interDerivU.clear();
 					row.clear();
 					
 					interCurve.push_back(getCurrPoint(curves[(kk*4)],u));
 					interCurve.push_back(getCurrPoint(curves[(kk*4)+1],u));
 					interCurve.push_back(getCurrPoint(curves[(kk*4)+2],u));
 					interCurve.push_back(getCurrPoint(curves[(kk*4)+3],u));
+
+					
+					interDerivU.push_back(getCurrDeriv(curves[(kk*4)],u));
+					interDerivU.push_back(getCurrDeriv(curves[(kk*4)+1],u));
+					interDerivU.push_back(getCurrDeriv(curves[(kk*4)+2],u));
+					interDerivU.push_back(getCurrDeriv(curves[(kk*4)+3],u));
+
+
 					
 					v = 0;
 					for (int j = 0; j <= tesselationLv; j++){
 
 						std::vector<float> newPoint = getCurrPoint(interCurve,v);
+						std::vector<float> newDerivU = getCurrPoint(interDerivU,v);
+						std::vector<float> newDerivV = getCurrDeriv(interCurve,v);
+						std::vector<float> auxN;
+
+						insertIfMissing(this->UVs,vtxPts);
+						insertIfMissing(this->normals,vtxPts);
+						
 						newPoint.erase(newPoint.begin() + 3); 
-						vertex.push_back(newPoint);
+						(this->position).insert({vtxPts,newPoint});
+
+						cross(newDerivU,newDerivV,auxN);
+						normalize(auxN[0],auxN[1],auxN[2],auxN);
+						this->normals[vtxPts].push_back(auxN);
+						
+						std::vector<float> auxUV{( (float)j * (uFreq)) + initU, ((float)i *(vFreq)) + initV};
+						this->UVs[vtxPts].push_back(auxUV);
 
 						row.push_back(vtxPts++);
 						v += tessFact;
@@ -635,4 +945,56 @@ class Bezier : public Mesh{
 
 			return point;
 		}
+
+		
+
+		
+
+		std::vector<float> getCurrDeriv(std::vector<std::vector<float>> pts,float t){
+			std::vector<float> point;
+			std::vector<std::vector<float>>bezierM = {
+					{-1.0f,  3.0f, -3.0f,  1.0f},
+					{ 3.0f, -6.0f,  3.0f, 0.0f},
+					{-3.0f,  3.0f,  0.0f,  0.0f},
+					{ 1.0f,  0.0f,  0.0f,  0.0f}
+					};
+
+			std::vector<std::vector<float>> a;
+			std::vector<float> T = { (float)pow(t,2)*3 ,  t, 1, 0 };
+			
+			for (int i = 0;  i < 4; i++){
+				a.push_back({0});
+				std::vector<float> p = { pts[0][i],pts[1][i],pts[2][i],pts[3][i] };
+				matDotVec(bezierM, p, &a[i]);
+			}
+
+			point.clear();
+			matDotVec(a,T,&point);
+
+			return point;
+		}
+
+		void cross(std::vector<float> vec1, std::vector<float> vec2, std::vector<float> &retVec){
+			retVec.clear();
+			retVec.push_back(vec1[1]*vec2[2] - vec1[2]*vec2[1]);
+			retVec.push_back(vec1[2]*vec2[0] - vec1[0]*vec2[2]);
+			retVec.push_back(vec1[0]*vec2[1] - vec1[1]*vec2[0]);
+		}
+
+
+		int partitionUv(int patchNum){
+			double k = (double) patchNum;
+			k = sqrt(k);
+			k = floor(k);
+			k += 1;
+			int r = (int) k;
+			return r;
+		}
+
 };
+
+
+
+
+
+
