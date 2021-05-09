@@ -79,16 +79,18 @@ class Mesh{
 			std::vector<float> pos = position[vx];
 			
 			
+
+
+			for (float i:pos){
+				vertexDescriptor.push_back(i);
+			}
+			
+
 			std::vector<float> uvCoord = UVs[vx][0];
 			if (UVs[vx].size() > 1) UVs[vx].erase(UVs[vx].begin());
 
 			std::vector<float> normal = normals[vx][0];
 			if (normals[vx].size() > 1) normals[vx].erase(normals[vx].begin());
-
-			for (float i:pos){
-				vertexDescriptor.push_back(i);
-			}
-
 			
 			for (float i:uvCoord){
 				vertexDescriptor.push_back(i);
@@ -96,6 +98,7 @@ class Mesh{
 			for (float i:normal){
 				vertexDescriptor.push_back(i);
 			}
+			
 			return vex++;
 		}
 
@@ -825,24 +828,38 @@ class Bezier : public Mesh{
 
 			int UVFact = partitionUv(patcheNum);
 
+				printf("%d\n",UVFact );
+				printf("%d\n",patcheNum );
+			
 			float initU;
 			float initV;
 			float maxU;
 			float maxV;
 
-			float uFreq = (maxU - initU)/(float)(tesselation);
-			float vFreq = (maxV - initV)/(float)(tesselation);
-
 			for (int kk = 0; kk < patcheNum; kk++){
 				u = 0;
 				int aux = kk % (UVFact);
 
-				initU = (float)(aux) * (1/UVFact);
-				maxU = initU + UVFact;
+				initU = (float)(aux) * (1/(float)UVFact);
+				maxU = initU + (1/(float)UVFact);
 
 				aux = (aux/UVFact);
-				initV = (float)(aux)*(1/UVFact);
-				maxV = initV + UVFact;
+				initV = (float)(aux)*(1/(float)UVFact);
+				maxV = initV + (1/(float)UVFact);
+
+				printf("%f\n",initU );
+				printf("%f\n",maxU );
+				printf("%f\n",initV );
+				printf("%f\n",maxV );
+
+
+
+				float uFreq = (maxU - initU)/(float)(tesselationLv);
+				float vFreq = (maxV - initV)/(float)(tesselationLv);
+
+				printf("%f\n",uFreq);
+				printf("%f\n",vFreq );
+
 
 
 				std::vector<std::vector<float>> interCurve;
