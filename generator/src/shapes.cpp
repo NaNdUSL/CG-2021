@@ -574,7 +574,7 @@ class Cylinder : public Cone{
 					}	
 					
 
-					if (st>1 && st<stacks+1){
+					if (st>0 && st<stacks+1){
 						normalize(aux[0],0,aux[2],auxN);
 					}
 
@@ -587,11 +587,7 @@ class Cylinder : public Cone{
 					}
 
 
-					if (st == stacks+1){
-						std::vector<float> auxNA{0,1,0};
-						this->normals[vtxPts].push_back(auxNA);
-						this->normals[vtxPts].push_back(auxNA);
-					}
+
 
 
 					if(st == 0  || st == stacks+2){
@@ -600,12 +596,28 @@ class Cylinder : public Cone{
 						auxN[2] = 0;
 					}
 
-					this->normals[vtxPts].push_back(auxN);
+					
+					if (st == stacks+1){
+						std::vector<float> auxNA{0,1,0};
+						normalize(aux[0],0,aux[2],auxN);
+						//vec.insert(vec.begin(), 3);
+
+						this->normals[vtxPts].push_back(auxN);
+						this->normals[vtxPts].push_back(auxN);
+						this->normals[vtxPts].push_back(auxN);
+						this->normals[vtxPts].push_back(auxNA);
+						
+						
+					}
+
+					else this->normals[vtxPts].push_back(auxN);
+
+
 
 					if(sl==0 && st>0 && st<stacks+1){
 						std::vector<float> auxUVA{0.0f,(float)st * (vFreq)};
 						std::vector<float> auxUVB{1.0f,(float)st * (vFreq)};
-						this->UVs[vtxPts].push_back(auxUVA);
+						this->UVs[vtxPts].push_back(auxUVA); // vai estar invertido para o topo e base!!!!
 						this->UVs[vtxPts].push_back(auxUVB);
 						this->UVs[vtxPts].push_back(auxUVB);
 						this->UVs[vtxPts].push_back(auxUVA);
@@ -828,8 +840,8 @@ class Bezier : public Mesh{
 
 			int UVFact = partitionUv(patcheNum);
 
-				printf("%d\n",UVFact );
-				printf("%d\n",patcheNum );
+/*				printf("%d\n",UVFact );
+				printf("%d\n",patcheNum );*/
 			
 			float initU;
 			float initV;
@@ -847,18 +859,18 @@ class Bezier : public Mesh{
 				initV = (float)(aux)*(1/(float)UVFact);
 				maxV = initV + (1/(float)UVFact);
 
-				printf("%f\n",initU );
+/*				printf("%f\n",initU );
 				printf("%f\n",maxU );
 				printf("%f\n",initV );
-				printf("%f\n",maxV );
+				printf("%f\n",maxV );*/
 
 
 
 				float uFreq = (maxU - initU)/(float)(tesselationLv);
 				float vFreq = (maxV - initV)/(float)(tesselationLv);
 
-				printf("%f\n",uFreq);
-				printf("%f\n",vFreq );
+/*				printf("%f\n",uFreq);
+				printf("%f\n",vFreq );*/
 
 
 
@@ -977,7 +989,7 @@ class Bezier : public Mesh{
 					};
 
 			std::vector<std::vector<float>> a;
-			std::vector<float> T = { (float)pow(t,2)*3 ,  t, 1, 0 };
+			std::vector<float> T = { (float)pow(t,2)*3 ,  2*t, 1, 0 };
 			
 			for (int i = 0;  i < 4; i++){
 				a.push_back({0});
@@ -996,6 +1008,7 @@ class Bezier : public Mesh{
 			retVec.push_back(vec1[1]*vec2[2] - vec1[2]*vec2[1]);
 			retVec.push_back(vec1[2]*vec2[0] - vec1[0]*vec2[2]);
 			retVec.push_back(vec1[0]*vec2[1] - vec1[1]*vec2[0]);
+			
 		}
 
 

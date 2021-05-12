@@ -28,6 +28,7 @@ using namespace tinyxml2;
 
 // Source Files
 #include "cam.cpp"
+#include "lights.cpp"
 #include "model.cpp"
 #include "groupClasses.cpp"
 #include "scene.cpp"
@@ -43,6 +44,21 @@ void detectMouseButs(int button, int state, int x, int y);
 void control(int x, int y);
 void keyInput(unsigned char key, int x, int y);
 void renderScene(void);
+
+
+
+
+
+/////////////////////////////////////////
+unsigned int t, tw, th;
+unsigned char *texData;
+unsigned int texID;
+////////////////////////////////////////
+
+
+
+
+
 
 
 
@@ -102,16 +118,19 @@ void renderScene(void){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 
+	scene->cam.place();
+
+	scene->placeLights();
 
 	// places the camera on the scene and draw Axis
-	scene->cam.place();
+
 	if (scene->oAxisDr) scene->axis();
 	if (scene->ccAxisDr) scene->ccAxis();
 
 	// Draw Scene
 	float fps = scene->getFPS();
 	if (!(fps < 0)) glutSetWindowTitle(((scene->name) + " - FPS: " + ((std::to_string(fps)).c_str()) + " - " + (std::to_string(scene->speedUp).c_str()) + "x ").c_str());
-	scene->drawGroups();
+	scene->drawGroups(texID);
 
 
 	// End of frame
@@ -119,6 +138,9 @@ void renderScene(void){
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
 
 
 int main(int argc,  char **argv) {	
@@ -162,8 +184,35 @@ int main(int argc,  char **argv) {
 
 	// Start Glew and read Models for memory and VBO
 	glewInit();
+	glEnable(GL_LIGHTING);
+	glEnable(GL_TEXTURE_2D);
+	glEnableClientState(GL_NORMAL_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glEnableClientState(GL_VERTEX_ARRAY);
+
+	//////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////
+	ilGenImages(1,&t);
+	ilBindImage(t);
+	ilLoadImage((ILstring)"uvCheckerA.png");
+	tw = ilGetInteger(IL_IMAGE_WIDTH);
+	th = ilGetInteger(IL_IMAGE_HEIGHT);
+	ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
+	texData = ilGetData();
+	glGenTextures(1,&texID); // unsigned int texID - variavel global;
+	glBindTexture(GL_TEXTURE_2D,texID);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tw, th, 0, GL_RGBA, GL_UNSIGNED_BYTE, texData);
+	glBindTexture(GL_TEXTURE_2D,0);
+	//////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////	
+	
 	parser.parse();
+
+	scene->setupLights();
 
 
 	//  OpenGL settings

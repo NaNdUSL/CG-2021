@@ -2,10 +2,14 @@ class Model{
 	public:
 	
 	std::vector<float> vertexList;
+	std::vector<float> normalList;
+	std::vector<float> uvList;
 	std::vector<unsigned int> facesList;
 	unsigned int indexNumber;
 
 	GLuint vertex;
+	GLuint normals;
+	GLuint uvs;
 	GLuint indices;
 
 	unsigned int hm,hmw,hmh;
@@ -37,12 +41,33 @@ class Model{
 		glEnd();
 	}
 
-	void drawVBO(){
+	void drawVBO(int drawNormals=1){
+
+
 		glBindBuffer(GL_ARRAY_BUFFER,vertex);
 		glVertexPointer(3, GL_FLOAT, 0, 0);
 
+		glBindBuffer(GL_ARRAY_BUFFER,normals);
+		glNormalPointer(GL_FLOAT, 0, 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER,uvs);
+		glTexCoordPointer(2,GL_FLOAT,0,0);
+
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices);
 		glDrawElements(GL_TRIANGLES, indexNumber, GL_UNSIGNED_INT, 0);
+
+		if (drawNormals){
+			for (int i = 0; i < (int)vertexList.size(); i+=3 ){
+				glBegin(GL_LINES);
+				GLfloat Green[] = {1.0f, 0.0f, 1.0f, 1.0f};
+				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Green);
+				glMaterialfv(GL_FRONT, GL_EMISSION, Green);
+				glColor3f(1.0f, 0.0f, 1.0f);
+				glVertex3f(vertexList[i], vertexList[i+1], vertexList[i+2]);				
+				glVertex3f(vertexList[i]+normalList[i], vertexList[i+1]+normalList[i+1], vertexList[i+2]+normalList[i+2]);
+				glEnd();				
+			}
+		}
 	}
 
 	
@@ -55,30 +80,55 @@ class Model{
 		float auxf;
 		unsigned int auxi;
 
+
 		mod >> numVertices;
 		mod >> numFaces;
 		
-		for(int i = 0; i < 3*numVertices;i++){
-			mod >> auxf;
-			vertexList.push_back(auxf);
+		for (int j = 0; j < numVertices; ++j){
+			for(int i = 0; i < 3;i++){
+				mod >> auxf;
+				vertexList.push_back(auxf);
+				//printf("%f\n", auxf);
+			}
+			for(int i = 0; i < 2;i++){
+				mod >> auxf;
+				uvList.push_back(auxf);
+			}		
+			for(int i = 0; i < 3;i++){
+				mod >> auxf;
+				normalList.push_back(auxf);
+			}
 		}
 
 		for(int i = 0; i < 3*numFaces; i++){
 			mod >> auxi;
 			facesList.push_back(auxi);
 		}
+
+
+
 		mod.close();
 	}
 
 
 	void prepareDataVBO(){
+		
+		glGenBuffers(1,&indices);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER,(unsigned int)((sizeof(unsigned int))*facesList.size()), facesList.data(), GL_STATIC_DRAW);
+
 		glGenBuffers(1,&vertex);
 		glBindBuffer(GL_ARRAY_BUFFER, vertex);
 		glBufferData(GL_ARRAY_BUFFER,(unsigned int)((sizeof(float))*vertexList.size()), vertexList.data(), GL_STATIC_DRAW);
 
-		glGenBuffers(1,&indices);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER,(unsigned int)((sizeof(unsigned int))*facesList.size()), facesList.data(), GL_STATIC_DRAW);
+		glGenBuffers(1,&normals);
+		glBindBuffer(GL_ARRAY_BUFFER, normals);
+		glBufferData(GL_ARRAY_BUFFER,(unsigned int)((sizeof(unsigned int))*normalList.size()), normalList.data(), GL_STATIC_DRAW);
+
+		glGenBuffers(1,&uvs);
+		glBindBuffer(GL_ARRAY_BUFFER, uvs);
+		glBufferData(GL_ARRAY_BUFFER,(unsigned int)((sizeof(unsigned int))*uvList.size()), uvList.data(), GL_STATIC_DRAW);
+		
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
     	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

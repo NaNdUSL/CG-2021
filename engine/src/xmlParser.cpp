@@ -45,6 +45,10 @@ class XMLParser{
 					else if(!tagName.compare("settings")){
 						parseSettings(iterator);
 					}
+					else if(!tagName.compare("lights")){
+						parseLight(iterator);
+					}
+					
 					else parseStatement(gps,iterator,tagName);
 				}
 			}
@@ -97,12 +101,67 @@ class XMLParser{
 				if ( (*(currentScene->modelTable)).find(fileName) == (*(currentScene->modelTable)).end()){
 					if (iterator->Attribute("hmap")) (*(currentScene->modelTable))[fileName] = new Model(fileName,std::string (iterator->Attribute("hmap")),getParsAtt(iterator,"I", 30)); 
 					else (*(currentScene->modelTable))[fileName] = new Model(fileName);
-				}
+				}//vai sair daqui vai pro gen
 				tris += (int)(((((*(currentScene->modelTable))[fileName])->facesList.size()))/3);
 				parent.models.push_back( std::pair<std::vector<float>, Model*>(color,(*(currentScene->modelTable))[fileName]));
 			}
 		}
 
+
+		void parseLight(XMLElement* base){
+			XMLElement* iterator;
+			LightRef* lightAdd;
+			std::vector<float> postSpec{0,0,0};
+			std::vector<float> spotSpec{0,0,0};
+			float exponent;
+			float cutoff;
+
+			for(iterator = base->FirstChildElement(); iterator != NULL; iterator = iterator->NextSiblingElement()){
+				postSpec[0] = getParsAtt(iterator,"X", 0.0f);
+				postSpec[1] = getParsAtt(iterator,"Y", 0.0f);
+				postSpec[2] = getParsAtt(iterator,"Z", 0.0f);
+
+				std::string lightType(iterator->Attribute("type"));
+				
+				if (!lightType.compare("DIRECTIONAL")){
+					lightAdd = new DirectLight(postSpec);
+				}
+				
+				else if (!lightType.compare("SPOT")){
+					printf("bruh\n");
+					exponent = getParsAtt(iterator,"exp", 0.0f);
+					cutoff = getParsAtt(iterator,"cOff", 180.0f);
+
+					spotSpec[0] = getParsAtt(iterator,"dsX", 0.0f);
+					spotSpec[1] = getParsAtt(iterator,"dsY", 0.0f);
+					spotSpec[2] = getParsAtt(iterator,"dsZ", -1.0f);
+					
+					lightAdd = new SpotLight(postSpec,spotSpec,exponent,cutoff);
+				}
+
+				else{
+					lightAdd = new PointLight(postSpec);
+				}
+
+				lightAdd->intensityMultiplier = getParsAtt(iterator,"I", 1.0f);
+
+				lightAdd->ambt[0] = getParsAtt(iterator,"aR", 0.0f);
+				lightAdd->ambt[1] = getParsAtt(iterator,"aG", 0.0f);
+				lightAdd->ambt[2] = getParsAtt(iterator,"aB", 0.0f);
+				lightAdd->ambt[3] = getParsAtt(iterator,"aA", 1.0f);
+
+				lightAdd->diff[0] = getParsAtt(iterator,"dR", 1.0f);
+				lightAdd->diff[1] = getParsAtt(iterator,"dG", 1.0f);
+				lightAdd->diff[2] = getParsAtt(iterator,"dB", 1.0f);
+				lightAdd->diff[3] = getParsAtt(iterator,"dA", 1.0f);
+
+				lightAdd->spec[0] = getParsAtt(iterator,"sR", lightAdd->diff[0]);
+				lightAdd->spec[1] = getParsAtt(iterator,"sG", lightAdd->diff[1]);
+				lightAdd->spec[2] = getParsAtt(iterator,"sB", lightAdd->diff[2]);
+				lightAdd->spec[3] = getParsAtt(iterator,"sA", lightAdd->diff[3]);
+				currentScene->lightConfigs.push_back(lightAdd);
+			}
+		}
 
 		void parseTranslate(Group &parent,XMLElement* base){
 			std::vector<float> v;
