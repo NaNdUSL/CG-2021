@@ -320,20 +320,20 @@ class Cone : public Sphere{
 						this->normals[vtxPts].push_back(auxN);
 
 						if(sl==0 && st>1 && st<stacks+1){
-							std::vector<float> auxUVA{0.0f,1.0f -(float)st * (vFreq)};
-							std::vector<float> auxUVB{1.0f,1.0f -(float)st * (vFreq)};
+							std::vector<float> auxUVA{0.0f,1.0f -((float)st+1) * (vFreq)};
+							std::vector<float> auxUVB{1.0f,1.0f -((float)st+1) * (vFreq)};
 							this->UVs[vtxPts].push_back(auxUVA);
 							this->UVs[vtxPts].push_back(auxUVA);
-							this->UVs[vtxPts].push_back(auxUVB);							
+							this->UVs[vtxPts].push_back(auxUVB);
 							this->UVs[vtxPts].push_back(auxUVA);
 							this->UVs[vtxPts].push_back(auxUVB);
 							this->UVs[vtxPts].push_back(auxUVB);
 						}
 
 						else if(sl==0 && st==1){
-							std::vector<float> auxUVA{1.0f,1.0f - (float)st * (vFreq)};
+							std::vector<float> auxUVA{1.0f,1.0f - ((float)st+1) * (vFreq)};
 							std::vector<float> auxUVC{baseUVRad + baseUVRad* sin(freq*sl),baseUVRad + baseUVRad* cos(freq*sl)};
-							std::vector<float> auxUVB{0.0f,1.0f - (float)st * (vFreq)};
+							std::vector<float> auxUVB{0.0f,1.0f - ((float)st+1) * (vFreq)};
 							this->UVs[vtxPts].push_back(auxUVC);
 
 							this->UVs[vtxPts].push_back(auxUVC);
@@ -349,7 +349,7 @@ class Cone : public Sphere{
 
 						else if(st==1){
 							std::vector<float> auxUVA{baseUVRad + baseUVRad* sin(freq*sl),baseUVRad + baseUVRad* cos(freq*sl)};
-							std::vector<float> auxUVB{(float) sl* (uFreq),1.0f -(float)st * (vFreq)};
+							std::vector<float> auxUVB{(float) sl* (uFreq),1.0f -((float)st+1) * (vFreq)};
 							
 							this->UVs[vtxPts].push_back(auxUVA);
 							this->UVs[vtxPts].push_back(auxUVA);							
@@ -370,7 +370,7 @@ class Cone : public Sphere{
 						}
 
 						else{
-							std::vector<float> auxUV{(float) sl* (uFreq),1.0f -(float)st * (vFreq)};
+							std::vector<float> auxUV{(float) sl* (uFreq),1.0f -((float)st+1) * (vFreq)};
 							this->UVs[vtxPts].push_back(auxUV);
 						}
 
@@ -588,8 +588,10 @@ class Cylinder : public Cone{
 			float heiStck = height/(stacks);
 			float freq = (2*M_PI)/slices;
 			
-			float uFreq = 1/(float)(slices-1);
-			float vFreq = 1/(float)(stacks+1);
+			float uFreq = 1/(float)(slices);
+			float vFreq = 2/(3*(float)(stacks));
+
+			float baseUVRad = (float)1/6;
 			
 			std::vector<int> row;
 			std::vector<float> aux;
@@ -654,27 +656,79 @@ class Cylinder : public Cone{
 						this->normals[vtxPts].push_back(auxN);
 						this->normals[vtxPts].push_back(auxN);
 						this->normals[vtxPts].push_back(auxNA);
-						
-						
 					}
 
 					else this->normals[vtxPts].push_back(auxN);
 
 
 
-					if(sl==0 && st>0 && st<stacks+1){
-						std::vector<float> auxUVA{0.0f,(float)st * (vFreq)};
-						std::vector<float> auxUVB{1.0f,(float)st * (vFreq)};
-						this->UVs[vtxPts].push_back(auxUVA); // vai estar invertido para o topo e base!!!!
-						this->UVs[vtxPts].push_back(auxUVB);
-						this->UVs[vtxPts].push_back(auxUVB);
-						this->UVs[vtxPts].push_back(auxUVA);
-						this->UVs[vtxPts].push_back(auxUVA);
-						this->UVs[vtxPts].push_back(auxUVB);
+					if(sl==0 && st>1 && st<stacks+1){
+						std::vector<float> auxUVA{1.0f,1 - ((float)st+1) * (vFreq)};
+						std::vector<float> auxUVB{0.0f,1 - ((float)st+1) * (vFreq)};
+						
+							this->UVs[vtxPts].push_back(auxUVA);
+							this->UVs[vtxPts].push_back(auxUVA);
+							this->UVs[vtxPts].push_back(auxUVB);
+							this->UVs[vtxPts].push_back(auxUVA);
+							this->UVs[vtxPts].push_back(auxUVB);
+							this->UVs[vtxPts].push_back(auxUVB);
 					}
 
+					else if(st==0){
+						std::vector<float> auxUVA{baseUVRad,baseUVRad};
+						this->UVs[vtxPts].push_back(auxUVA);
+					}
+					else if(st==stacks+2){
+						std::vector<float> auxUVA{1-baseUVRad,baseUVRad};
+						this->UVs[vtxPts].push_back(auxUVA);
+					}
+
+					else if(sl==0 && st==stacks+1){
+						std::vector<float> auxUVA{0.0f,1 - ((float)st+1) * (vFreq)};
+						std::vector<float> auxUVB{1.0f,1 - ((float)st+1) * (vFreq)};
+						std::vector<float> auxUVC{1-baseUVRad + baseUVRad* sin(freq*sl),baseUVRad + baseUVRad* cos(freq*sl)};
+						
+						this->UVs[vtxPts].push_back(auxUVB);
+						this->UVs[vtxPts].push_back(auxUVB);
+						this->UVs[vtxPts].push_back(auxUVA);
+						this->UVs[vtxPts].push_back(auxUVC);
+					}
+					
+					else if(st==stacks+1){
+						std::vector<float> auxUV{1 - (float) sl* (uFreq),1 - ((float)st+1) * (vFreq)};
+						std::vector<float> auxUVA{1-baseUVRad + baseUVRad* sin(freq*sl),baseUVRad + baseUVRad* cos(freq*sl)};
+						this->UVs[vtxPts].push_back(auxUV);
+						this->UVs[vtxPts].push_back(auxUV);
+						this->UVs[vtxPts].push_back(auxUV);
+						this->UVs[vtxPts].push_back(auxUVA);
+					}
+
+					else if(sl==0 && st==1){
+						std::vector<float> auxUVA{0.0f,1 - ((float)st+1) * (vFreq)};
+						std::vector<float> auxUVB{1.0f,1 - ((float)st+1) * (vFreq)};
+						std::vector<float> auxUVC{baseUVRad + baseUVRad* sin(freq*sl),baseUVRad + baseUVRad* cos(freq*sl)};
+						
+						this->UVs[vtxPts].push_back(auxUVC);
+						this->UVs[vtxPts].push_back(auxUVC);
+						this->UVs[vtxPts].push_back(auxUVB);
+						this->UVs[vtxPts].push_back(auxUVA);
+						this->UVs[vtxPts].push_back(auxUVA);
+						
+					}
+					
+					else if(st==1){
+						std::vector<float> auxUV{1 - (float) sl* (uFreq),1 - ((float)st+1) * (vFreq)};
+						std::vector<float> auxUVA{baseUVRad + baseUVRad* sin(freq*sl),baseUVRad + baseUVRad* cos(freq*sl)};
+						this->UVs[vtxPts].push_back(auxUVA);
+						this->UVs[vtxPts].push_back(auxUVA);
+						this->UVs[vtxPts].push_back(auxUV);
+					}
+
+
+
+					
 					else{
-						std::vector<float> auxUV{(float) sl* (uFreq),(float)st * (vFreq)};
+						std::vector<float> auxUV{1 - (float) sl* (uFreq),1 - ((float)st+1) * (vFreq)};
 						this->UVs[vtxPts].push_back(auxUV);
 					}
 
