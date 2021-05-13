@@ -1,5 +1,5 @@
 class Model{
-	public:
+public:
 	
 	std::vector<float> vertexList;
 	std::vector<float> normalList;
@@ -133,9 +133,9 @@ class Model{
 		
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-    	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    	indexNumber = (unsigned int) facesList.size();
+		indexNumber = (unsigned int) facesList.size();
 	}
 
 
@@ -178,3 +178,63 @@ class Model{
 };
 
 
+class Material{
+public:
+
+	std::vector<float> diff;
+	std::vector<float> spec;
+	std::vector<float> ambt;
+	std::vector<float> emsv;
+	
+	unsigned int t, tw, th;
+	unsigned int texSet = 0;
+	unsigned char *texData;
+	
+	unsigned int texID = 0;
+
+	Material(std::vector<float> diff, std::vector<float> spec, std::vector<float> ambt, std::vector<float> emsv){
+		
+		this->diff.assign(diff.begin(),diff.end());
+		this->spec.assign(spec.begin(),spec.end());
+		this->ambt.assign(ambt.begin(),ambt.end());
+
+	}
+
+	Material(std::string fileName, std::vector<float> diff, std::vector<float> spec, std::vector<float> ambt, std::vector<float> emsv){
+
+		this->diff.assign(diff.begin(),diff.end());
+		this->spec.assign(spec.begin(),spec.end());
+		this->ambt.assign(ambt.begin(),ambt.end());
+
+		ilGenImages(1,&t);
+		ilBindImage(t);
+		ilLoadImage((ILstring)fileName.c_str());
+		tw = ilGetInteger(IL_IMAGE_WIDTH);
+		th = ilGetInteger(IL_IMAGE_HEIGHT);
+		ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
+		texData = ilGetData();
+		glGenTextures(1,&texID);
+
+	}
+
+	void setup(){
+
+		GLfloat col[] = {diff[0], diff[1], diff[2], 1.0f};
+		
+		if (texSet){
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tw, th, 0, GL_RGBA, GL_UNSIGNED_BYTE, texData);
+
+		}
+
+		glColor3f(diff[0], diff[1], diff[2]);
+		glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, col);
+		glBindTexture(GL_TEXTURE_2D,texID);
+
+		
+	}
+
+};
