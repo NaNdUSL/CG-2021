@@ -771,8 +771,8 @@ class Torus : public Mesh{
 		}
 
 		void shape(){
-			float uFreq = 1/(float)(slices+1);
-			float vFreq = 1/(float)(stacks+1);
+			float uFreq = 1/(float)(slices);
+			float vFreq = 1/(float)(stacks-1);
 			float alpha = (2*M_PI)/slices;
 			float beta = (2*M_PI)/(stacks-1);
 			int vtxPts = 1;
@@ -780,37 +780,36 @@ class Torus : public Mesh{
 
 			std::vector<int> row;
 
-			for (int st = 0; st < stacks+1; st++){
+			for (int st = 0; st < stacks; st++){
 				row.clear();
 				for (int sl = 0; sl < slices+1; sl++){
 					insertIfMissing(this->UVs,vtxPts);
 					insertIfMissing(this->normals,vtxPts);
 					
 					if (sl == 0 && st > 0 && st < stacks){
-						std::vector<float> auxUVA{0.0f,(float)st * (vFreq)};
-						std::vector<float> auxUVB{1.0f,(float)st * (vFreq)};
-						this->UVs[vtxPts].push_back(auxUVA);
+						std::vector<float> auxUVB{1.0f,1-(float)st * (vFreq)};
+						std::vector<float> auxUVA{0.0f,1-(float)st * (vFreq)};
+						
 						this->UVs[vtxPts].push_back(auxUVB);
 						this->UVs[vtxPts].push_back(auxUVB);
 						this->UVs[vtxPts].push_back(auxUVA);
+
+						this->UVs[vtxPts].push_back(auxUVB);
 						this->UVs[vtxPts].push_back(auxUVA);
-						this->UVs[vtxPts].push_back(auxUVB);						
+						this->UVs[vtxPts].push_back(auxUVA);
+
+						
 					}
 
 					if (sl > 0 && st == 0){
-						std::vector<float> auxUVA{(float)sl * (uFreq), 0.0f};
-						std::vector<float> auxUVB{(float)sl * (uFreq), 1.0f};
-						this->UVs[vtxPts].push_back(auxUVA);
-						this->UVs[vtxPts].push_back(auxUVB);
-						this->UVs[vtxPts].push_back(auxUVB);
-						this->UVs[vtxPts].push_back(auxUVA);
-						this->UVs[vtxPts].push_back(auxUVA);
-						this->UVs[vtxPts].push_back(auxUVB);						
+						std::vector<float> auxUVA{1-(float)sl * (uFreq), 1.0f};
+
+						this->UVs[vtxPts].push_back(auxUVA);					
 					}
 
 					if (sl == 0 && st == 0){
-						std::vector<float> auxUVA{0.0f, 0.0f};
-						std::vector<float> auxUVB{1.0f, 1.0f};
+						std::vector<float> auxUVB{0.0f, 0.0f};
+						std::vector<float> auxUVA{1.0f, 1.0f};
 						this->UVs[vtxPts].push_back(auxUVA);
 						this->UVs[vtxPts].push_back(auxUVB);
 						this->UVs[vtxPts].push_back(auxUVB);
@@ -820,7 +819,7 @@ class Torus : public Mesh{
 					}
 
 					if (sl > 0 && st > 0 && st < stacks){
-						std::vector<float> auxUV{(float) sl* (uFreq),(float)st * (vFreq)};
+						std::vector<float> auxUV{1-(float) sl* (uFreq),1-(float)st * (vFreq)};
 						this->UVs[vtxPts].push_back(auxUV);
 					}
 

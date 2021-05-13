@@ -187,26 +187,36 @@ class Scene{
 				break;
 
 				case '7':
+				turnLights(1);
 				drawTrans = !(drawTrans);
 				break;
 
 				case '8':
-				if(lightsOn){
-					glDisable(GL_LIGHTING);
-				}
-				else{
-					glEnable(GL_LIGHTING);
-				};
-				lightsOn = !(lightsOn);
+				turnLights();
 				break;
 
 				case '9':
+				turnLights(1);
 				drawnormals = !(drawnormals);
 				break;				
 
 				default:
 				break;
 			}
+		}
+
+
+		void turnLights(int toOff=0){
+			if(lightsOn){
+				glDisable(GL_LIGHTING);
+				lightsOn = 0;
+			}
+			else if (!toOff){
+				drawnormals = 0;
+				drawTrans = 0;
+				glEnable(GL_LIGHTING);
+				lightsOn = 1;
+			};			
 		}
 };
 

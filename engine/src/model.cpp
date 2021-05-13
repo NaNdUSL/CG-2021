@@ -56,12 +56,14 @@ class Model{
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices);
 		glDrawElements(GL_TRIANGLES, indexNumber, GL_UNSIGNED_INT, 0);
 
+		glBindTexture(GL_TEXTURE_2D, 0);
+		
 		if (drawNormals){
 			for (int i = 0; i < (int)vertexList.size(); i+=3 ){
 				glBegin(GL_LINES);
-				GLfloat Green[] = {1.0f, 0.0f, 1.0f, 1.0f};
-				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Green);
-				glMaterialfv(GL_FRONT, GL_EMISSION, Green);
+				GLfloat purple[] = {1.0f, 0.0f, 1.0f, 1.0f};
+				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, purple);
+				//glMaterialfv(GL_FRONT, GL_EMISSION, Green);
 				glColor3f(1.0f, 0.0f, 1.0f);
 				glVertex3f(vertexList[i], vertexList[i+1], vertexList[i+2]);				
 				glVertex3f(vertexList[i]+normalList[i], vertexList[i+1]+normalList[i+1], vertexList[i+2]+normalList[i+2]);
