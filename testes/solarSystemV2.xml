@@ -10,7 +10,11 @@
 		</camera>
 		<background R="0.1" G="0.1" B="0.1" A="0.7"/>
 	</settings>
-
+	
+	<lights>
+		<light type="POINT" I="30" X="0" Y="0" Z="0" dR="1" dG="1" dB="1" />
+	</lights>
+	
 	<set tgt="merRot" exp="2"/>
 	<set tgt="venRot" exp="-1"/>
 	<set tgt="earRot" exp="3"/>
@@ -26,8 +30,8 @@
 
 		<!-- Comet -->
 		<group>
- 			<scale X="0.6" Y="0.6" Z="0.6" />
- 			<rotate angle="69" axisX="1" axisZ="0"/>
+			<scale X="0.6" Y="0.6" Z="0.6" />
+			<rotate angle="69" axisX="1" axisZ="0"/>
 
 			<translate time="200">
 				<point Y="150.000000" Z="0" X="0"/>
@@ -44,7 +48,7 @@
 				<group>
 					<scale X="0.3" Y="0.3" Z="0.3" />
 					<models>
-						<model file="teap.3d" R="0.86" G="0.4" B="0.6" />
+						<model file="testeUV.3d" R="0.86" G="0.4" B="0.6" texture="bruh420.png"/>
 					</models>
 				</group>
 			</group>
@@ -53,7 +57,7 @@
 		<group>
 			<scale X="0.6" Y="0.6" Z="0.6" />
 			<models>
-				<model file="sphere.3d" R="1.0" G="1.0" B="0.0" />
+				<model file="sphereUV.3d" emsvR="1.0" emsvG="1.0" emsvB="1.0" emsvA="1.0" texture="sunmap.jpg"/>
 			</models>
 
 			<!-- Mercury -->
@@ -73,7 +77,7 @@
 				<group>
 					<rotate time="110" axisX="0" axisY="1" axisZ="0"/>
 					<models>
-						<model file="sphere.3d" R="0.86" G="0.86" B="0.86" />
+						<model file="sphereUV.3d" R="0.86" G="0.86" B="0.86" texture="mercurymap.jpg"/>
 					</models>
 				</group>
 			</group>
@@ -95,7 +99,7 @@
 				<group>
 					<rotate time="90" axisX="0" axisY="1" axisZ="0"/>
 					<models>
-						<model file="sphere.3d" R="1.0" G="0.64" B="0.0" />
+						<model file="sphereUV.3d" R="1.0" G="0.64" B="0.0" texture="venusmap.jpg"/>
 					</models>
 				</group>
 			</group>
@@ -103,7 +107,7 @@
 			<!-- Earth -->
 			<group>
 				<rotate angle="earRot" axisX="1"/>
-				<translate time="50">
+				<translate time="365">
 					<point X="53.955002" Y="0" Z="0"/>
 					<point X="26.977501" Y="0" Z="-62.301870"/>
 					<point X="0" Y="0" Z="-71.940002"/>
@@ -115,9 +119,9 @@
 				</translate>
 				<scale X="0.091" Y="0.091" Z="0.091"/>
 				<group>
-					<rotate time="100" axisX="0" axisY="1" axisZ="0"/>
+					<rotate time="1" axisX="0" axisY="1" axisZ="0"/>
 					<models>
-						<model file="sphere.3d" R="0.12" G="0.56" B="1.0" />
+						<model file="sphereUV.3d" R="0.12" G="0.56" B="1.0" texture="earthmap.jpg"/>
 					</models>
 				</group>
 				<group>
@@ -131,7 +135,7 @@
 					</translate>
 					<scale X="0.27" Y="0.27" Z="0.27" />
 					<models>
-						<model file="sphere.3d" R="0.86" G="0.86" B="0.86" />
+						<model file="sphereUV.3d" R="0.86" G="0.86" B="0.86" texture="moonmap1k.jpg"/>
 					</models>
 				</group>
 			</group>
@@ -151,9 +155,9 @@
 				</translate>
 				<scale X="0.049" Y="0.049" Z="0.049" />
 				<group>
-					<rotate time="100" axisX="0" axisY="1" axisZ="0"/>
+					<rotate time="5" axisX="0" axisY="1" axisZ="0"/>
 					<models>
-						<model file="sphere.3d" R="1.0" G="0.12" B="0.0" />
+						<model file="sphereUV.3d" R="1.0" G="0.12" B="0.0" texture="mars_1k_color.jpg"/>
 					</models>
 				</group>
 				<group>
@@ -165,7 +169,7 @@
 					</translate>
 					<scale X="0.2" Y="0.2" Z="0.2" />
 					<models>
-						<model file="sphere.3d" R="0.86" G="0.86" B="0.86" />
+						<model file="sphereUV.3d" R="0.86" G="0.86" B="0.86" texture="deimosbump.jpg"/>
 					</models>
 				</group>
 				<group>
@@ -178,7 +182,7 @@
 					</translate>
 					<scale X="0.27" Y="0.27" Z="0.27" />
 					<models>
-						<model file="sphere.3d" R="0.86" G="0.86" B="0.86" />
+						<model file="sphereUV.3d" R="0.86" G="0.86" B="0.86" texture="phobosbump.jpg"/>
 					</models>
 				</group>
 			</group>
@@ -206,7 +210,7 @@
 						<group>
 							<scale  X="scl" Y="scl" Z="scl" />
 							<models>
-								<model file="asteroid.3d" R="0.4" G="0.4" B="0.4"/>
+								<model file="asteroidUV.3d" R="0.4" G="0.4" B="0.4" texture="2k_eris_fictional.jpg"/>
 							</models>
 						</group>
 					</group>
@@ -233,7 +237,7 @@
 				<group>
 					<rotate time="95" axisX="0" axisY="1" axisZ="0"/>
 					<models>
-						<model file="sphere.3d" R="0.74" G="0.56" B="0.56" />
+						<model file="sphereUV.3d" R="0.74" G="0.56" B="0.56" texture="jupitermap.jpg"/>
 					</models>
 				</group>
 				<group>
@@ -268,7 +272,7 @@
 											<group>
 												<scale  X="0.2" Y="0.2" Z="0.2" />
 												<models>
-													<model file="sphere.3d" R="0.4" G="0.4" B="0.4"/>
+													<model file="sphereUV.3d" R="0.4" G="0.4" B="0.4" texture="2k_haumea_fictional.jpg"/>
 												</models>
 											</group>
 										</group>
@@ -297,14 +301,14 @@
 				<group>
 					<rotate time="105" axisX="0" axisY="1" axisZ="0"/>
 					<models>
-						<model file="sphere.3d" R="0.74" G="0.73" B="0.42" />
+						<model file="sphereUV.3d" R="0.74" G="0.73" B="0.42" texture="saturnmap.jpg"/>
 					</models>
 				</group>
 				<group>
 					<!-- <rotate angle="90*xtrs" axisY="0" axisX="1" axisZ="0" /> -->
 					<scale X="3.5" Y="0.1" Z="3.5" />
 					<models>
-						<model file="torus.3d" R="0.96" G="0.87" B="0.7" />
+						<model file="torus.3d" R="0.96" G="0.87" B="0.7" texture="saturnringcolor.jpg"/>
 					</models>
 				</group>
 			</group>
@@ -326,14 +330,14 @@
 				<group>
 					<rotate time="107" axisX="0" axisY="1" axisZ="0"/>
 					<models>
-						<model file="sphere.3d" R="0.0" G="0.36" B="1.0" />
+						<model file="sphereUV.3d" R="0.0" G="0.36" B="1.0" texture="uranusmap.jpg"/>
 					</models>
 				</group>
 				<group>
 					<rotate angle="180*xtrs" axisY="0" axisX="1" axisZ="0" />
 					<scale X="3.0" Y="0.1" Z="3.0" />
 					<models>
-						<model file="torus.3d" R="0.69" G="0.88" B="0.9" />
+						<model file="torus.3d" R="0.69" G="0.88" B="0.9" texture="uranusringcolor.jpg"/>
 					</models>
 				</group>
 			</group>
@@ -355,7 +359,7 @@
 				<group>
 					<rotate time="89" axisX="0" axisY="1" axisZ="0"/>
 					<models>
-						<model file="sphere.3d" R="0.0" G="0.0" B="0.8" />
+						<model file="sphereUV.3d" R="0.0" G="0.0" B="0.8" texture="neptunemap.jpg"/>
 					</models>
 				</group>
 			</group>
@@ -377,7 +381,7 @@
 				<group>
 					<rotate time="85" axisX="0" axisY="1" axisZ="0"/>
 					<models>
-						<model file="sphere.3d" R="0.8" G="0.8" B="0.8" />
+						<model file="sphereUV.3d" R="0.8" G="0.8" B="0.8" texture="plutomap1k.jpg"/>
 					</models>
 				</group>
 			</group>
