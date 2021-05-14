@@ -56,14 +56,12 @@ public:
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices);
 		glDrawElements(GL_TRIANGLES, indexNumber, GL_UNSIGNED_INT, 0);
 
-		glBindTexture(GL_TEXTURE_2D, 0);
-		
 		if (drawNormals){
+			glBindTexture(GL_TEXTURE_2D, 0);
 			for (int i = 0; i < (int)vertexList.size(); i+=3 ){
 				glBegin(GL_LINES);
 				GLfloat purple[] = {1.0f, 0.0f, 1.0f, 1.0f};
 				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, purple);
-				//glMaterialfv(GL_FRONT, GL_EMISSION, Green);
 				glColor3f(1.0f, 0.0f, 1.0f);
 				glVertex3f(vertexList[i], vertexList[i+1], vertexList[i+2]);				
 				glVertex3f(vertexList[i]+normalList[i], vertexList[i+1]+normalList[i+1], vertexList[i+2]+normalList[i+2]);
@@ -186,7 +184,7 @@ public:
 	std::vector<float> ambt;
 	std::vector<float> emsv;
 	
-	unsigned int t, tw, th;
+	unsigned int t = 5, tw, th;
 	unsigned int texSet = 0;
 	unsigned char *texData;
 	
@@ -197,16 +195,24 @@ public:
 		this->diff.assign(diff.begin(),diff.end());
 		this->spec.assign(spec.begin(),spec.end());
 		this->ambt.assign(ambt.begin(),ambt.end());
+		this->emsv.assign(emsv.begin(),emsv.end());
+		texSet = 0;
+		texID = 0;
 
 	}
 
 	Material(std::string fileName, std::vector<float> diff, std::vector<float> spec, std::vector<float> ambt, std::vector<float> emsv){
+		//printf("%s\n",fileName.c_str());
+
+		unsigned int k;
 
 		this->diff.assign(diff.begin(),diff.end());
 		this->spec.assign(spec.begin(),spec.end());
 		this->ambt.assign(ambt.begin(),ambt.end());
+		this->emsv.assign(emsv.begin(),emsv.end());
 
-		ilGenImages(1,&t);
+		ilGenImages(1,&(k));
+		this-> t = k;
 		ilBindImage(t);
 		ilLoadImage((ILstring)fileName.c_str());
 		tw = ilGetInteger(IL_IMAGE_WIDTH);
@@ -214,27 +220,32 @@ public:
 		ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
 		texData = ilGetData();
 		glGenTextures(1,&texID);
+		texSet = 1;
 
 	}
 
 	void setup(){
 
-		GLfloat col[] = {diff[0], diff[1], diff[2], 1.0f};
+		GLfloat colD[] = {diff[0], diff[1], diff[2], diff[3]};
+		GLfloat colS[] = {spec[0], spec[1], spec[2], spec[3]};
+		GLfloat colA[] = {ambt[0], ambt[1], ambt[2], ambt[3]};
+		GLfloat colE[] = {emsv[0], emsv[1], emsv[2], emsv[3]};
 		
 		if (texSet){
+			glBindTexture(GL_TEXTURE_2D,texID);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tw, th, 0, GL_RGBA, GL_UNSIGNED_BYTE, texData);
-
 		}
 
-		glColor3f(diff[0], diff[1], diff[2]);
-		glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, col);
-		glBindTexture(GL_TEXTURE_2D,texID);
 
+		if (diff[3]>= 0) glColor3f(diff[0], diff[1], diff[2]);
+		if (ambt[3]>= 0) glMaterialfv(GL_FRONT, GL_AMBIENT, colA);
+		if (spec[3]>= 0) glMaterialfv(GL_FRONT, GL_SPECULAR, colS);
+		if (diff[3]>= 0) glMaterialfv(GL_FRONT, GL_DIFFUSE, colD);
+		if (emsv[3]>= 0) glMaterialfv(GL_FRONT, GL_EMISSION, colE);
 		
 	}
-
 };

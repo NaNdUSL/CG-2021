@@ -88,22 +88,63 @@ class XMLParser{
 
 		void parseModel(Group &parent,XMLElement* base){
 			XMLElement* iterator;
-			std::vector<float> color;
+			std::vector<float> diff;
+			std::vector<float> ambt;
+			std::vector<float> spec;
+			std::vector<float> emsv;
+
+			Material* aux;
+
 			for(iterator = base->FirstChildElement(); iterator != NULL; iterator = iterator->NextSiblingElement()){
-				color.clear();
+				diff.clear();
+				ambt.clear();
+				spec.clear();
+				emsv.clear();
+
+
 				std::string fileName(iterator->Attribute("file"));
-				color.push_back(getParsAtt(iterator,"R", 0.5f));
-				color.push_back(getParsAtt(iterator,"G", 0.5f));
-				color.push_back(getParsAtt(iterator,"B", 0.5f));
+				
+				
+
+				diff.push_back(getParsAtt(iterator,"diffR", 1.0f));
+				ambt.push_back(getParsAtt(iterator,"ambtR", diff[0]));
+				spec.push_back(getParsAtt(iterator,"specR", 0.0f));
+				emsv.push_back(getParsAtt(iterator,"emsvR", 0.0f));
+
+				diff.push_back(getParsAtt(iterator,"diffG", 1.0f));
+				ambt.push_back(getParsAtt(iterator,"ambtG", diff[1]));
+				spec.push_back(getParsAtt(iterator,"specG", 0.0f));
+				emsv.push_back(getParsAtt(iterator,"emsvG", 0.0f));
+
+				diff.push_back(getParsAtt(iterator,"diffB", 1.0f));
+				ambt.push_back(getParsAtt(iterator,"ambtB", diff[2]));
+				spec.push_back(getParsAtt(iterator,"specB", 0.0f));
+				emsv.push_back(getParsAtt(iterator,"emsvB", 0.0f));
+
+				diff.push_back(getParsAtt(iterator,"diffA", 1.0f));
+				ambt.push_back(getParsAtt(iterator,"ambtA", diff[3]));
+				spec.push_back(getParsAtt(iterator,"specA", 0.0f));
+				emsv.push_back(getParsAtt(iterator,"emsvA", 0.0f));
 
 
+				
 
 				if ( (*(currentScene->modelTable)).find(fileName) == (*(currentScene->modelTable)).end()){
-					if (iterator->Attribute("hmap")) (*(currentScene->modelTable))[fileName] = new Model(fileName,std::string (iterator->Attribute("hmap")),getParsAtt(iterator,"I", 30)); 
-					else (*(currentScene->modelTable))[fileName] = new Model(fileName);
-				}//vai sair daqui vai pro gen
+					(*(currentScene->modelTable))[fileName] = new Model(fileName);
+				}
+
+				if (iterator->Attribute("texture")){
+					std::string textureName(iterator->Attribute("texture"));
+					aux = new Material(textureName,diff,spec,ambt,emsv);
+				}
+
+				else{
+					aux = new Material(diff,spec,ambt,emsv);
+				}
+
+
 				tris += (int)(((((*(currentScene->modelTable))[fileName])->facesList.size()))/3);
-				parent.models.push_back( std::pair<std::vector<float>, Model*>(color,(*(currentScene->modelTable))[fileName]));
+				parent.models.push_back( std::pair<Material*, Model*>(aux,(*(currentScene->modelTable))[fileName]));
 			}
 		}
 

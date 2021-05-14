@@ -250,7 +250,7 @@ class CatmullTranslate : public Transform{
 class Group{
 	public:
 		std::vector<Transform*> trans;
-		std::vector<std::pair<std::vector<float>,Model*>> models;
+		std::vector<std::pair<Material*,Model*>> models;
 		std::vector<Group> child;
 
 		int flagTRI = 0;
@@ -261,28 +261,24 @@ class Group{
 			}
 		}
 		
-		void makeGroup(int timeDelta, int toDraw, int drawNormals, unsigned int texID){
+		void makeGroup(int timeDelta, int toDraw, int drawNormals, Material*UVCheck, int checkUV){
 			glPushMatrix();
 
 
 			applyTransform(timeDelta, toDraw);
-			for (std::pair<std::vector<float>,Model*> m: models){
-				GLfloat col[] = {m.first[0], m.first[1], m.first[2], 1.0f};
-				//glMaterialfv(GL_FRONT, GL_EMISSION, col);
-				glColor3f(m.first[0], m.first[1], m.first[2]);
-				glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, col);
+			for (std::pair<Material*,Model*> m: models){
 
-				glBindTexture(GL_TEXTURE_2D, texID);
+				if (checkUV) UVCheck->setup();
+				else m.first->setup(); 
+				
+
 				if (flagTRI) m.second->drawT();
 				else m.second->drawVBO(drawNormals);
 				glBindTexture(GL_TEXTURE_2D, 0);
-
-
-
 			}
 	
 			for (Group grp: child){
-				grp.makeGroup(timeDelta, toDraw, drawNormals, texID);
+				grp.makeGroup(timeDelta, toDraw, drawNormals, UVCheck, checkUV);
 			}
 	
 			glPopMatrix();

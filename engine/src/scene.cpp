@@ -20,6 +20,12 @@ class Scene{
 		std::vector<Group>*groups = new std::vector<Group>();
 		std::map<std::string,Model*>*modelTable = new std::map<std::string,Model*>();
 		
+		//Material
+		Material*UVC;
+		int checkUV = 0;
+
+
+
 		// - Engine Runtime Options
 		// Mode of polygon (fill / line)
 		int polyMode = GL_FILL;
@@ -40,12 +46,12 @@ class Scene{
 		std::vector<float> background{0.2f,0.2f,0.3f,0.2f};
 
 
-		void drawGroups(unsigned int texID){
+		void drawGroups(){
 			int now = glutGet(GLUT_ELAPSED_TIME);
 			int elapsed = ((now - lastMeasure)*speedUp*notPause);
 			lastMeasure = now; 
 			for (Group g: (*groups)){
-				g.makeGroup(elapsed, drawTrans, drawnormals, texID);
+				g.makeGroup(elapsed, drawTrans, drawnormals, UVC, checkUV);
 			}
 		}
 
@@ -154,6 +160,13 @@ class Scene{
 			glEnd();
 		}
 
+		void initializeUVC(){
+			std::vector<float> col{1,1,1,1};
+			std::vector<float> no{0,0,0,-1};
+			UVC = new Material(std::string ("uvCheckerA.png"),col,no,col,no);
+		}
+
+
 
 		// Receive keyboard input and applay options
 		void keyboardOpts(unsigned char key, int x, int y){
@@ -188,6 +201,7 @@ class Scene{
 
 				case '7':
 				turnLights(1);
+				if (drawnormals)  drawnormals = 0;
 				drawTrans = !(drawTrans);
 				break;
 
@@ -197,7 +211,12 @@ class Scene{
 
 				case '9':
 				turnLights(1);
+				if (drawTrans)  drawTrans = 0;
 				drawnormals = !(drawnormals);
+				break;
+
+				case '0':
+				checkUV = !(checkUV);
 				break;				
 
 				default:
