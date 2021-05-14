@@ -220,27 +220,28 @@ class Sphere : public Mesh{
 						if(sl==0 && st>1 && st<stacks+1){
 							std::vector<float> auxUVA{1.0f,1.0f - (float)st * (vFreq)};
 							std::vector<float> auxUVB{0.0f,1.0f - (float)st * (vFreq)};							
-							this->UVs[vtxPts].push_back(auxUVA);
-							this->UVs[vtxPts].push_back(auxUVA);
-							this->UVs[vtxPts].push_back(auxUVB);							
-							this->UVs[vtxPts].push_back(auxUVA);
+							
 							this->UVs[vtxPts].push_back(auxUVB);
 							this->UVs[vtxPts].push_back(auxUVB);
+							this->UVs[vtxPts].push_back(auxUVA);
+							this->UVs[vtxPts].push_back(auxUVB);
+							this->UVs[vtxPts].push_back(auxUVA);
+							this->UVs[vtxPts].push_back(auxUVA);
 						}
 
 						else if(sl==0 && st==1){
 							std::vector<float> auxUVA{1.0f,1.0f - (float)st * (vFreq)};
 							std::vector<float> auxUVB{0.0f,1.0f - (float)st * (vFreq)};
-							this->UVs[vtxPts].push_back(auxUVA);
 							this->UVs[vtxPts].push_back(auxUVB);
 							this->UVs[vtxPts].push_back(auxUVA);
 							this->UVs[vtxPts].push_back(auxUVB);
-							this->UVs[vtxPts].push_back(auxUVB);							
+							this->UVs[vtxPts].push_back(auxUVA);
+							this->UVs[vtxPts].push_back(auxUVA);							
 							this->UVs[vtxPts].push_back(auxUVA);
 						}
 
 						else{
-							std::vector<float> auxUV{1 - (float) sl* (uFreq), 1 - (float)st * (vFreq)};
+							std::vector<float> auxUV{(float) sl* (uFreq), 1 - (float)st * (vFreq)};
 							this->UVs[vtxPts].push_back(auxUV);
 						}
 
@@ -663,8 +664,8 @@ class Cylinder : public Cone{
 
 
 					if(sl==0 && st>1 && st<stacks+1){
-						std::vector<float> auxUVA{1.0f,1 - ((float)st+1) * (vFreq)};
-						std::vector<float> auxUVB{0.0f,1 - ((float)st+1) * (vFreq)};
+						std::vector<float> auxUVA{0.0f,1 - ((float)st+1) * (vFreq)};
+						std::vector<float> auxUVB{1.0f,1 - ((float)st+1) * (vFreq)};
 						
 							this->UVs[vtxPts].push_back(auxUVA);
 							this->UVs[vtxPts].push_back(auxUVA);
@@ -688,14 +689,14 @@ class Cylinder : public Cone{
 						std::vector<float> auxUVB{1.0f,1 - ((float)st+1) * (vFreq)};
 						std::vector<float> auxUVC{1-baseUVRad + baseUVRad* sin(freq*sl),baseUVRad + baseUVRad* cos(freq*sl)};
 						
-						this->UVs[vtxPts].push_back(auxUVB);
-						this->UVs[vtxPts].push_back(auxUVB);
 						this->UVs[vtxPts].push_back(auxUVA);
+						this->UVs[vtxPts].push_back(auxUVA);
+						this->UVs[vtxPts].push_back(auxUVB);
 						this->UVs[vtxPts].push_back(auxUVC);
 					}
 					
 					else if(st==stacks+1){
-						std::vector<float> auxUV{1 - (float) sl* (uFreq),1 - ((float)st+1) * (vFreq)};
+						std::vector<float> auxUV{(float) sl* (uFreq),1 - ((float)st+1) * (vFreq)};
 						std::vector<float> auxUVA{1-baseUVRad + baseUVRad* sin(freq*sl),baseUVRad + baseUVRad* cos(freq*sl)};
 						this->UVs[vtxPts].push_back(auxUV);
 						this->UVs[vtxPts].push_back(auxUV);
@@ -710,14 +711,14 @@ class Cylinder : public Cone{
 						
 						this->UVs[vtxPts].push_back(auxUVC);
 						this->UVs[vtxPts].push_back(auxUVC);
+						this->UVs[vtxPts].push_back(auxUVA);
 						this->UVs[vtxPts].push_back(auxUVB);
-						this->UVs[vtxPts].push_back(auxUVA);
-						this->UVs[vtxPts].push_back(auxUVA);
+						this->UVs[vtxPts].push_back(auxUVB);
 						
 					}
 					
 					else if(st==1){
-						std::vector<float> auxUV{1 - (float) sl* (uFreq),1 - ((float)st+1) * (vFreq)};
+						std::vector<float> auxUV{(float) sl* (uFreq),1 - ((float)st+1) * (vFreq)};
 						std::vector<float> auxUVA{baseUVRad + baseUVRad* sin(freq*sl),baseUVRad + baseUVRad* cos(freq*sl)};
 						this->UVs[vtxPts].push_back(auxUVA);
 						this->UVs[vtxPts].push_back(auxUVA);
@@ -728,7 +729,7 @@ class Cylinder : public Cone{
 
 					
 					else{
-						std::vector<float> auxUV{1 - (float) sl* (uFreq),1 - ((float)st+1) * (vFreq)};
+						std::vector<float> auxUV{(float) sl* (uFreq),1 - ((float)st+1) * (vFreq)};
 						this->UVs[vtxPts].push_back(auxUV);
 					}
 
@@ -787,8 +788,8 @@ class Torus : public Mesh{
 					insertIfMissing(this->normals,vtxPts);
 					
 					if (sl == 0 && st > 0 && st < stacks){
-						std::vector<float> auxUVB{1.0f,1-(float)st * (vFreq)};
-						std::vector<float> auxUVA{0.0f,1-(float)st * (vFreq)};
+						std::vector<float> auxUVB{0.0f,1-(float)st * (vFreq)};
+						std::vector<float> auxUVA{1.0f,1-(float)st * (vFreq)};
 						
 						this->UVs[vtxPts].push_back(auxUVB);
 						this->UVs[vtxPts].push_back(auxUVB);
@@ -802,14 +803,14 @@ class Torus : public Mesh{
 					}
 
 					if (sl > 0 && st == 0){
-						std::vector<float> auxUVA{1-(float)sl * (uFreq), 1.0f};
+						std::vector<float> auxUVA{(float)sl * (uFreq), 1.0f};
 
 						this->UVs[vtxPts].push_back(auxUVA);					
 					}
 
 					if (sl == 0 && st == 0){
-						std::vector<float> auxUVB{0.0f, 0.0f};
-						std::vector<float> auxUVA{1.0f, 1.0f};
+						std::vector<float> auxUVB{1.0f, 0.0f};
+						std::vector<float> auxUVA{0.0f, 1.0f};
 						this->UVs[vtxPts].push_back(auxUVA);
 						this->UVs[vtxPts].push_back(auxUVB);
 						this->UVs[vtxPts].push_back(auxUVB);
@@ -819,7 +820,7 @@ class Torus : public Mesh{
 					}
 
 					if (sl > 0 && st > 0 && st < stacks){
-						std::vector<float> auxUV{1-(float) sl* (uFreq),1-(float)st * (vFreq)};
+						std::vector<float> auxUV{(float) sl* (uFreq),1-(float)st * (vFreq)};
 						this->UVs[vtxPts].push_back(auxUV);
 					}
 

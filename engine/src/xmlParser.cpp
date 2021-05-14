@@ -95,7 +95,10 @@ class XMLParser{
 
 			Material* aux;
 
+
+
 			for(iterator = base->FirstChildElement(); iterator != NULL; iterator = iterator->NextSiblingElement()){
+				int inv = 0;
 				diff.clear();
 				ambt.clear();
 				spec.clear();
@@ -126,6 +129,10 @@ class XMLParser{
 				spec.push_back(getParsAtt(iterator,"specA", 0.0f));
 				emsv.push_back(getParsAtt(iterator,"emsvA", 0.0f));
 
+				if (iterator->Attribute("invert")){
+					inv++;
+				}
+
 
 				
 
@@ -135,11 +142,11 @@ class XMLParser{
 
 				if (iterator->Attribute("texture")){
 					std::string textureName(iterator->Attribute("texture"));
-					aux = new Material(textureName,diff,spec,ambt,emsv);
+					aux = new Material(textureName,diff,spec,ambt,emsv,inv);
 				}
 
 				else{
-					aux = new Material(diff,spec,ambt,emsv);
+					aux = new Material(diff,spec,ambt,emsv,inv);
 				}
 
 

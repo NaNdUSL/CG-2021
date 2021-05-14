@@ -163,7 +163,7 @@ class Scene{
 		void initializeUVC(){
 			std::vector<float> col{1,1,1,1};
 			std::vector<float> no{0,0,0,-1};
-			UVC = new Material(std::string ("uvCheckerA.png"),col,no,col,no);
+			UVC = new Material(std::string ("uvCheckerA.png"),col,no,col,no,0);
 		}
 
 

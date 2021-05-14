@@ -13,6 +13,7 @@ class LightRef{
 		GLfloat spec[4];
 		
 		LightRef(std::vector<float> vals, float isPoint){
+
 			this->id = total++;
 			for (int i = 0; i < 3; ++i){
 				vectsUtil[i] = vals[i];
@@ -26,6 +27,7 @@ class LightRef{
 				diff[i] *= intensityMultiplier;
 				spec[i] *= intensityMultiplier;
 			}
+
 			glEnable(GL_LIGHT0+id); //GL_LIGHT0+i = GL_LIGHTi
 			glLightfv(GL_LIGHT0+id, GL_AMBIENT, ambt);
 			glLightfv(GL_LIGHT0+id, GL_DIFFUSE, diff);

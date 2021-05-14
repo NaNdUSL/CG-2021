@@ -43,7 +43,6 @@ public:
 
 	void drawVBO(int drawNormals=1){
 
-
 		glBindBuffer(GL_ARRAY_BUFFER,vertex);
 		glVertexPointer(3, GL_FLOAT, 0, 0);
 
@@ -55,6 +54,10 @@ public:
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices);
 		glDrawElements(GL_TRIANGLES, indexNumber, GL_UNSIGNED_INT, 0);
+
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_FRONT);
+		glFrontFace(GL_CW);    
 
 		if (drawNormals){
 			glBindTexture(GL_TEXTURE_2D, 0);
@@ -190,7 +193,9 @@ public:
 	
 	unsigned int texID = 0;
 
-	Material(std::vector<float> diff, std::vector<float> spec, std::vector<float> ambt, std::vector<float> emsv){
+	int invertCull = 0;
+
+	Material(std::vector<float> diff, std::vector<float> spec, std::vector<float> ambt, std::vector<float> emsv, int invertCull){
 		
 		this->diff.assign(diff.begin(),diff.end());
 		this->spec.assign(spec.begin(),spec.end());
@@ -198,10 +203,10 @@ public:
 		this->emsv.assign(emsv.begin(),emsv.end());
 		texSet = 0;
 		texID = 0;
-
+		this->invertCull = invertCull;
 	}
 
-	Material(std::string fileName, std::vector<float> diff, std::vector<float> spec, std::vector<float> ambt, std::vector<float> emsv){
+	Material(std::string fileName, std::vector<float> diff, std::vector<float> spec, std::vector<float> ambt, std::vector<float> emsv, int invertCull){
 		//printf("%s\n",fileName.c_str());
 
 		unsigned int k;
@@ -221,6 +226,7 @@ public:
 		texData = ilGetData();
 		glGenTextures(1,&texID);
 		texSet = 1;
+		this->invertCull = invertCull;
 
 	}
 
@@ -246,6 +252,12 @@ public:
 		if (spec[3]>= 0) glMaterialfv(GL_FRONT, GL_SPECULAR, colS);
 		if (diff[3]>= 0) glMaterialfv(GL_FRONT, GL_DIFFUSE, colD);
 		if (emsv[3]>= 0) glMaterialfv(GL_FRONT, GL_EMISSION, colE);
+
+		if (invertCull){
+			glEnable(GL_CULL_FACE);
+			glCullFace(GL_FRONT);
+			glFrontFace(GL_CCW);
+		}
 		
 	}
 };

@@ -8,11 +8,11 @@
 			<center X="0" Y="0" Z="0"/>
 			<position A="pi/2" B="0" R="100"/>
 		</camera>
-		<background R="0.1" G="0.1" B="0.1" A="0.7"/>
+		<background R="0" G="0" B="0" A="0.7"/>
 	</settings>
 	
 	<lights>
-		<light type="POINT" I="30" X="0" Y="0" Z="0" dR="1" dG="1" dB="1" />
+		<light type="POINT" I="30" X="0" Y="0" Z="0" dR="1" dG="1" dB="1" aR="0" aB="0" aG="0" aA="1"/>
 	</lights>
 	
 	<set tgt="merRot" exp="2"/>
@@ -27,7 +27,7 @@
 	<set tgt="comRot" exp="-10"/>
 
 	<group>
-
+		<scale X="0.4" Y="0.4" Z="0.4" />
 		<!-- Comet -->
 		<group>
 			<scale X="0.6" Y="0.6" Z="0.6" />
@@ -48,7 +48,7 @@
 				<group>
 					<scale X="0.3" Y="0.3" Z="0.3" />
 					<models>
-						<model file="testeUV.3d" R="0.86" G="0.4" B="0.6" texture="bruh420.png"/>
+						<model file="testeUV.3d" diffR="0.43" diffG="0.2" diffB="0.3"/>
 					</models>
 				</group>
 			</group>
@@ -57,7 +57,7 @@
 		<group>
 			<scale X="0.6" Y="0.6" Z="0.6" />
 			<models>
-				<model file="sphereUV.3d" emsvR="1.0" emsvG="1.0" emsvB="1.0" emsvA="1.0" texture="sunmap.jpg"/>
+				<model file="sphereUV.3d" emsvR="1.0" emsvG="1.0" emsvB="1.0" emsvA="1.0" texture="8k_sun.jpg"/>
 			</models>
 
 			<!-- Mercury -->
@@ -97,7 +97,7 @@
 				</translate>
 				<scale X="0.087" Y="0.087" Z="0.087"/>
 				<group>
-					<rotate time="90" axisX="0" axisY="1" axisZ="0"/>
+					<rotate time="9" axisX="0" axisY="1" axisZ="0"/>
 					<models>
 						<model file="sphereUV.3d" R="1.0" G="0.64" B="0.0" texture="venusmap.jpg"/>
 					</models>
@@ -121,7 +121,7 @@
 				<group>
 					<rotate time="1" axisX="0" axisY="1" axisZ="0"/>
 					<models>
-						<model file="sphereUV.3d" R="0.12" G="0.56" B="1.0" texture="earthmap.jpg"/>
+						<model file="sphereUV.3d" R="0.12" G="0.56" B="1.0" texture="earthmap1k.jpg"/>
 					</models>
 				</group>
 				<group>
@@ -188,7 +188,7 @@
 			</group>
 
 			<!-- Inner Ring -->
-			<!-- <group>
+			<group>
 				<set tgt="radiusRocks" exp="160" />
 				<set tgt="radiusRocksMax" exp="50" />
 				<set tgt="rockNum" exp="300" />
@@ -196,27 +196,32 @@
 				<while exp="rockNum > 0">
 					<rand tgt="ang"/>
 					<rand tgt="xtrs"/>
+					<rand tgt="tm"/>
 
+					<set tgt="tm" exp="140+(tm*90)"/>
 					<set tgt="xtrs" exp= "(xtrs*radiusRocksMax)+radiusRocks"/>
 
 					<set tgt= "rockNum" exp="rockNum-1" />
 					<group>
-						<rotate angle="ang*360" axisY="1"/>
-						<translate X="xtrs"/>
-						<set tgt="scl" exp="0.25"/>
-						<scale  X="scl" Y="scl" Z="scl" />
-						<set tgt="minRads" exp="5"/>
-						<rand tgt="zscl"/>
+						<rotate time="tm" axisX="0" axisY="1" axisZ="0"/>
 						<group>
+							<rotate angle="ang*360" axisY="1"/>
+							<translate X="xtrs"/>
+							<set tgt="scl" exp="0.25"/>
 							<scale  X="scl" Y="scl" Z="scl" />
-							<models>
-								<model file="asteroidUV.3d" R="0.4" G="0.4" B="0.4"/>
-							</models>
+							<set tgt="minRads" exp="5"/>
+							<rand tgt="zscl"/>
+							<group>
+								<scale  X="scl" Y="scl" Z="scl" />
+								<models>
+									<model file="asteroidUV.3d" diffR="0.4" diffG="0.4" diffB="0.4"/>
+								</models>
+							</group>
 						</group>
 					</group>
 				</while>
 			</group>
- -->
+
 
 
 			<!-- Jupiter -->
@@ -235,7 +240,7 @@
 				</translate>
 				<scale X="0.2" Y="0.2" Z="0.2" />
 				<group>
-					<rotate time="95" axisX="0" axisY="1" axisZ="0"/>
+					<rotate time="25" axisX="0" axisY="1" axisZ="0"/>
 					<models>
 						<model file="sphereUV.3d" R="0.74" G="0.56" B="0.56" texture="jupitermap.jpg"/>
 					</models>
@@ -299,16 +304,16 @@
 				</translate>
 				<scale X="0.1836" Y="0.1836" Z="0.1836" />
 				<group>
-					<rotate time="105" axisX="0" axisY="1" axisZ="0"/>
+					<rotate time="69" axisX="0" axisY="1" axisZ="0"/>
 					<models>
 						<model file="sphereUV.3d" R="0.74" G="0.73" B="0.42" texture="saturnmap.jpg"/>
 					</models>
 				</group>
 				<group>
 					<!-- <rotate angle="90*xtrs" axisY="0" axisX="1" axisZ="0" /> -->
-					<scale X="3.5" Y="0.1" Z="3.5" />
+					<scale X="1.5" Y="0.1" Z="1.5" />
 					<models>
-						<model file="torus.3d" R="0.96" G="0.87" B="0.7" texture="saturnringcolor.jpg"/>
+						<model file="torUVNN.3d" R="0.96" G="0.87" B="0.7" texture="saturnringcolorHM.jpg"/>
 					</models>
 				</group>
 			</group>
@@ -328,16 +333,16 @@
 				</translate>
 				<scale X="0.1365" Y="0.1365" Z="0.1365" />
 				<group>
-					<rotate time="107" axisX="0" axisY="1" axisZ="0"/>
+					<rotate time="75" axisX="0" axisY="1" axisZ="0"/>
 					<models>
 						<model file="sphereUV.3d" R="0.0" G="0.36" B="1.0" texture="uranusmap.jpg"/>
 					</models>
 				</group>
 				<group>
 					<rotate angle="180*xtrs" axisY="0" axisX="1" axisZ="0" />
-					<scale X="3.0" Y="0.1" Z="3.0" />
+					<scale X="0.9" Y="0.1" Z="0.9" />
 					<models>
-						<model file="torus.3d" R="0.69" G="0.88" B="0.9" texture="uranusringcolor.jpg"/>
+						<model file="torUV.3d" R="0.69" G="0.88" B="0.9" texture="uranusringcolourHM.jpg"/>
 					</models>
 				</group>
 			</group>
@@ -357,7 +362,7 @@
 				</translate>
 				<scale X="0.1354" Y="0.1354" Z="0.1354" />
 				<group>
-					<rotate time="89" axisX="0" axisY="1" axisZ="0"/>
+					<rotate time="40" axisX="0" axisY="1" axisZ="0"/>
 					<models>
 						<model file="sphereUV.3d" R="0.0" G="0.0" B="0.8" texture="neptunemap.jpg"/>
 					</models>
@@ -379,7 +384,7 @@
 				</translate>
 				<scale X="0.017" Y="0.017" Z="0.017" />
 				<group>
-					<rotate time="85" axisX="0" axisY="1" axisZ="0"/>
+					<rotate time="50" axisX="0" axisY="1" axisZ="0"/>
 					<models>
 						<model file="sphereUV.3d" R="0.8" G="0.8" B="0.8" texture="plutomap1k.jpg"/>
 					</models>
@@ -387,4 +392,18 @@
 			</group>
 		</group>
 	</group>
+
+	<group>
+		<scale X="26" Y="26" Z="26" />
+		<models>
+			<model file="sky.3d" invert="T"  texture="8k_stars_milky_way.jpg" emsvR="0.4" emsvG="0.4" emsvB="0.4" emsvA="1.0" />
+		</models>
+	</group>
 </scene>
+
+
+
+
+
+
+
