@@ -956,21 +956,21 @@ class Bezier : public Mesh{
 				initU = (float)(aux) * (1/(float)UVFact);
 				maxU = initU + (1/(float)UVFact);
 
-				aux = (aux/UVFact);
+				aux = (kk/UVFact);
 				initV = (float)(aux)*(1/(float)UVFact);
 				maxV = initV + (1/(float)UVFact);
 
-/*				printf("%f\n",initU );
-				printf("%f\n",maxU );
-				printf("%f\n",initV );
-				printf("%f\n",maxV );*/
+				/*printf("IU %f\n",initU );*/
+				/*printf("MU  %f\n",maxU );*/
+				/*printf("IV   %f\n",initV );*/
+				/*printf("MV    %f\n",maxV );*/
 
 
 
 				float uFreq = (maxU - initU)/(float)(tesselationLv);
 				float vFreq = (maxV - initV)/(float)(tesselationLv);
 
-/*				printf("%f\n",uFreq);
+				/*printf("%f\n",uFreq);
 				printf("%f\n",vFreq );*/
 
 
