@@ -1,7 +1,0 @@
-<scene>
-	<group>
-		<models>
-			<model file="tor.3d" R="0.2" G="0.3" B="0.8" />
-		</models>
-	</group>
-</scene>
