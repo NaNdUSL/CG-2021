@@ -54,6 +54,16 @@
 			</models>
 		</group>
 		
+		<group>
+			<scale X="3.4" Y="3.4" Z="3.4" />
+			<translate X="multX*spcX" Y="-5" Z="400"/>
+			<!-- <rotate angle="-90" axisX="1"/> -->
+			<scale X="20" Y="20" Z="20" />
+			
+			<models>
+				<model file="HMUV.3d" emsvR="1" emsvG="1" emsvB="0" emsvA="1" texture="uvCheckerA.png"/>
+			</models>
+		</group>
 
 		<group>
 			<scale X="3.4" Y="3.4" Z="3.4" />

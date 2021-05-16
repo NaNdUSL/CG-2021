@@ -1,3 +1,5 @@
+#include <IL/il.h>
+
 class Mesh{
 	/* 
 		Class Mesh - Classe abstrata para geração da malha dos shapes;
@@ -103,11 +105,11 @@ class Mesh{
 		}
 
 
-		void insertIfMissing(std::map<int, std::vector<std::vector<float>>> m,int key){
+/*		void insertIfMissing(std::map<int, std::vector<std::vector<float>>> m,int key){
 			if ( m.find(key) == m.end() ) {
 				m[key] = std::vector<std::vector<float>>();
 			}
-		}
+		}*/
 
 
 
@@ -159,6 +161,13 @@ class Mesh{
 			retVec[0] = x * value;
 			retVec[1] = y * value;
 			retVec[2] = z * value;
+		}
+
+		void cross(std::vector<float> vec1, std::vector<float> vec2, std::vector<float> &retVec){
+			retVec.clear();
+			retVec.push_back(vec1[1]*vec2[2] - vec1[2]*vec2[1]);
+			retVec.push_back(vec1[2]*vec2[0] - vec1[0]*vec2[2]);
+			retVec.push_back(vec1[0]*vec2[1] - vec1[1]*vec2[0]);
 		}
 };
 
@@ -212,8 +221,8 @@ class Sphere : public Mesh{
 						normalize(aux[0],aux[1],aux[2],auxN);
 						
 
-						insertIfMissing(this->UVs,vtxPts);
-						insertIfMissing(this->normals,vtxPts);
+						//insertIfMissing(this->UVs,vtxPts);
+						//insertIfMissing(this->normals,vtxPts);
 						this->normals[vtxPts].push_back(auxN);
 						
 
@@ -300,8 +309,8 @@ class Cone : public Sphere{
 
 						normalize(height*sin(freq*sl), radius , height*cos(freq*sl),auxN);
 
-						insertIfMissing(this->UVs,vtxPts);
-						insertIfMissing(this->normals,vtxPts);
+						//insertIfMissing(this->UVs,vtxPts);
+						//insertIfMissing(this->normals,vtxPts);
 						
 						if (st == 0){
 							aux[1] =(-(height))/2;
@@ -442,8 +451,8 @@ class Plane: public Mesh{
 				for (int z = 0; z < zSlc+1; z++){
 					aux.clear();
 					rots.clear();
-					insertIfMissing(this->UVs,vtxPts);
-					insertIfMissing(this->normals,vtxPts);
+					//insertIfMissing(this->UVs,vtxPts);
+					//insertIfMissing(this->normals,vtxPts);
 
 					std::vector<float> auxUV{( (float)x * (uFreq)) + initU, ((float)z *(vFreq)) + initV};
 					//printf("%f\n", uFreq);
@@ -604,8 +613,8 @@ class Cylinder : public Cone{
 				for (int sl = 0; sl < slices; sl++){
 					aux.clear();
 
-					insertIfMissing(this->UVs,vtxPts);
-					insertIfMissing(this->normals,vtxPts);
+					//insertIfMissing(this->UVs,vtxPts);
+					//insertIfMissing(this->normals,vtxPts);
 					if ( st > 0 && st < stacks+2) {
 						aux.push_back(radius*sin(freq*sl));
 						aux.push_back((-(height))/2 +(heiStck)*(st-1));                   
@@ -784,8 +793,8 @@ class Torus : public Mesh{
 			for (int st = 0; st < stacks; st++){
 				row.clear();
 				for (int sl = 0; sl < slices+1; sl++){
-					insertIfMissing(this->UVs,vtxPts);
-					insertIfMissing(this->normals,vtxPts);
+					//insertIfMissing(this->UVs,vtxPts);
+					//insertIfMissing(this->normals,vtxPts);
 					
 					if (sl == 0 && st > 0 && st < stacks){
 						std::vector<float> auxUVB{0.0f,1-(float)st * (vFreq)};
@@ -1006,8 +1015,8 @@ class Bezier : public Mesh{
 						std::vector<float> newDerivV = getCurrDeriv(interCurve,v);
 						std::vector<float> auxN;
 
-						insertIfMissing(this->UVs,vtxPts);
-						insertIfMissing(this->normals,vtxPts);
+						//insertIfMissing(this->UVs,vtxPts);
+						//insertIfMissing(this->normals,vtxPts);
 						
 						newPoint.erase(newPoint.begin() + 3); 
 						(this->position).insert({vtxPts,newPoint});
@@ -1105,15 +1114,6 @@ class Bezier : public Mesh{
 			return point;
 		}
 
-		void cross(std::vector<float> vec1, std::vector<float> vec2, std::vector<float> &retVec){
-			retVec.clear();
-			retVec.push_back(vec1[1]*vec2[2] - vec1[2]*vec2[1]);
-			retVec.push_back(vec1[2]*vec2[0] - vec1[0]*vec2[2]);
-			retVec.push_back(vec1[0]*vec2[1] - vec1[1]*vec2[0]);
-			
-		}
-
-
 		int partitionUv(int patchNum){
 			double k = (double) patchNum;
 			k = sqrt(k);
@@ -1122,11 +1122,261 @@ class Bezier : public Mesh{
 			int r = (int) k;
 			return r;
 		}
-
+ 
 };
 
 
 
+/*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+
+class HeightPlane : public Mesh{
+	public:
+		float xDim, zDim;
+		int xSlc, zSlc;
+		unsigned int hm,hmw,hmh;
+		unsigned char *imageData;
+		float intensity;
+		float xRatio;
+		float zRatio;
+
+
+		HeightPlane(float xDim, float zDim, float intensity, int xSlc, int zSlc,std::string hmapFile,const char* fileName) : Mesh(fileName){
+			(this->xDim) = xDim;
+			(this->zDim) = zDim;
+			(this->xSlc) = xSlc;
+			(this->zSlc) = zSlc;
+
+
+			this->intensity = intensity;
+			ilGenImages(1,&hm);
+			ilBindImage(hm);
+			ilLoadImage((ILstring) hmapFile.c_str());
+			ilConvertImage(IL_LUMINANCE, IL_UNSIGNED_BYTE);
+	
+			hmw = ilGetInteger(IL_IMAGE_WIDTH);
+			hmh = ilGetInteger(IL_IMAGE_HEIGHT);
+	
+			imageData = ilGetData();
+		}
+	
+		
+		void shape(){
+			int vtxPts = 1;
+ 			xRatio = xDim/xSlc;
+			zRatio = zDim/zSlc;
+			
+			std::vector<float> rots;
+			std::vector<int> row;
+			std::vector<float> auxN;
+			std::vector<float> aux;
+
+			float uFreq = 1/(float)(xSlc);
+			float vFreq = 1/(float)(zSlc);
+
+			for (int x = 0;  x < xSlc+1; x++){
+				//printf(" XXXXXXXX %d\n",x);
+				row.clear();
+				for (int z = 0; z < zSlc+1; z++){
+					//printf(" ZZZZZZZZZZZZZ %d\n",z);
+					aux.clear();
+					auxN.clear();
+					rots.clear();
+					//insertIfMissing(this->UVs,vtxPts);
+					//insertIfMissing(this->normals,vtxPts);
+
+					auxN = getNormal(x,z);
+					std::vector<float> auxUV{( (float)x * (uFreq)), ((float)z *(vFreq))};
+					this->UVs[vtxPts].push_back(auxUV);
+
+					aux = getPoint(x,z);
+					this->normals[vtxPts].push_back(auxN);
+					(this->position).insert({vtxPts,aux});
+					row.push_back(vtxPts++);	
+				}
+				row.push_back(-1);
+				(this->planar).push_back(row);
+			}
+		}
+
+        //
+		std::vector<float> getPoint(int x, int z){
+			std::vector<float> aux;
+			aux.push_back((-(xDim)/2) + x* (this-> xRatio));
+			aux.push_back(getHMPValue(x,z));
+			aux.push_back((-(zDim)/2) + z*(this-> zRatio));
+			return aux;
+		}
+
+
+		std::vector<float> getNormal(int x, int z){
+			std::vector<float> p1 = getPoint(x,z-1);
+			std::vector<float> p2 = getPoint(x,z+1);
+			std::vector<float> p3 = getPoint(x-1,z);
+			std::vector<float> p4 = getPoint(x+1,z);
+
+			std::vector<float> v1{p2[0]-p1[0], p2[1]-p1[1], p2[2]-p1[2]};
+			std::vector<float> v2{p4[0]-p3[0], p4[1]-p3[1], p4[2]-p3[2]};
+
+			cross(v1,v2,p1);
+			normalize(p1[0],p1[1],p1[2],p1);
+			return p1;
+		}
+
+		float getHMPValue(int x, int z){
+			if ((x > xSlc || x < 0) || (z > zSlc || z < 0)) return 0.0f;
+			float lin = ((float)x/(xSlc+1))*hmh;
+			float col = ((float)z/(zSlc+1))*hmw;
+
+			//printf("%f,%f\n",((float)x/xSlc),((float)z/zSlc));
+			int pix = ((int)col)*(hmw);
+			pix += ((int)lin);
+			//printf("%d\n",pix );
+			return ((float)imageData[pix]/255)*intensity;
+		}
+};
 
 
 
+/*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+
+
+class HeightSphere : public Mesh{
+	public:
+		float radius;
+		int slices,stacks;
+		unsigned int hm,hmw,hmh;
+		unsigned char *imageData;
+		float intensity;
+		float xRatio;
+		float zRatio;
+		float freqalf;
+		float freqbet;
+		
+		
+		HeightSphere(float radius, int slices, int stacks, float intensity, std::string hmapFile, const char* fileName):Mesh(fileName){
+			this->radius = radius;
+			this->stacks = stacks;
+			this->slices = slices;
+			this->intensity = intensity;
+			ilGenImages(1,&hm);
+			ilBindImage(hm);
+			ilLoadImage((ILstring) hmapFile.c_str());
+			ilConvertImage(IL_LUMINANCE, IL_UNSIGNED_BYTE);
+	
+			hmw = ilGetInteger(IL_IMAGE_WIDTH);
+			hmh = ilGetInteger(IL_IMAGE_HEIGHT);
+	
+			imageData = ilGetData();
+		}
+
+		void shape(){
+
+			freqalf = (2*M_PI)/slices;
+			freqbet = (M_PI)/(stacks+1);
+			int vtxPts = 1;
+
+			float uFreq = 1/(float)(slices);
+			float vFreq = 1/(float)(stacks+1);
+
+			std::vector<int> row;
+
+			int st;
+			int sl;
+			for (st = 0; st < stacks+2; st++){
+				row.clear();
+				for (sl = 0; sl < slices; sl++){
+						//printf("%d\n",st);
+						std::vector<float> aux = getPoint(sl,st);
+						std::vector<float> auxN = getNormal(st,sl);
+						(this->position).insert({vtxPts,aux});
+						this->normals[vtxPts].push_back(auxN);
+						
+
+						if(sl==0 && st>1 && st<stacks+1){
+							std::vector<float> auxUVA{1.0f,1.0f - (float)st * (vFreq)};
+							std::vector<float> auxUVB{0.0f,1.0f - (float)st * (vFreq)};							
+							
+							this->UVs[vtxPts].push_back(auxUVB);
+							this->UVs[vtxPts].push_back(auxUVB);
+							this->UVs[vtxPts].push_back(auxUVA);
+							this->UVs[vtxPts].push_back(auxUVB);
+							this->UVs[vtxPts].push_back(auxUVA);
+							this->UVs[vtxPts].push_back(auxUVA);
+						}
+
+						else if(sl==0 && st==1){
+							std::vector<float> auxUVA{1.0f,1.0f - (float)st * (vFreq)};
+							std::vector<float> auxUVB{0.0f,1.0f - (float)st * (vFreq)};
+							this->UVs[vtxPts].push_back(auxUVB);
+							this->UVs[vtxPts].push_back(auxUVA);
+							this->UVs[vtxPts].push_back(auxUVB);
+							this->UVs[vtxPts].push_back(auxUVA);
+							this->UVs[vtxPts].push_back(auxUVA);							
+							this->UVs[vtxPts].push_back(auxUVA);
+						}
+
+						else{
+							std::vector<float> auxUV{(float) sl* (uFreq), 1 - (float)st * (vFreq)};
+							this->UVs[vtxPts].push_back(auxUV);
+						}
+
+						row.push_back(vtxPts);
+						if (!(st == 0 || st == stacks+1) || sl == slices-1) vtxPts++;
+				}
+				(this->planar).push_back(row);
+			}
+		}
+
+
+		std::vector<float> getPoint(int sl, int st){
+			std::vector<float> geNrm = getGeomNorm(sl,st);
+
+			float heightFact = getHMPValue(st,sl);
+			std::vector<float> res{geNrm[0]*(heightFact+radius), geNrm[1]*(heightFact+radius), geNrm[2]*(heightFact+radius)};
+			return res;
+		}
+
+		std::vector<float> getGeomNorm(int sl, int st){
+			std::vector<float> aux;
+			aux.push_back((cos(freqbet*st - (M_PI/2)))*sin(freqalf*sl));
+			aux.push_back(sin(freqbet*st - (M_PI/2)));
+			aux.push_back((cos(freqbet*st - (M_PI/2)))*cos(freqalf*sl));
+			return aux;
+		}
+
+		std::vector<float> getNormal(int z, int x){
+			std::vector<float> p1 = getPoint(x,z-1);
+			std::vector<float> p2 = getPoint(x,z+1);
+			std::vector<float> p3 = getPoint(x-1,z);
+			std::vector<float> p4 = getPoint(x+1,z);
+
+			std::vector<float> v1{p2[0]-p1[0], p2[1]-p1[1], p2[2]-p1[2]};
+			std::vector<float> v2{p4[0]-p3[0], p4[1]-p3[1], p4[2]-p3[2]};
+
+			cross(v2,v1,p1);
+			normalize(p1[0],p1[1],p1[2],p1);
+			return p1;
+		}
+
+		float getHMPValue(int st, int sl){
+			if ((st < 0) || st > (stacks + 1)) return 0.0f;
+			if ((sl < 0) || st > (slices)) return 0.0f; 
+			
+			int x = st;
+			int z = sl;
+
+			
+			float lin = ((float)1-(float)x/(stacks+2))*(hmh-1);
+			float col = ((float)z/(slices+1))*hmw;
+
+			//printf("%f,%f\n",(float)x/(stacks+1),((float)1-(float)z/(slices+1)));
+			//printf("%d,%d\n",((int)lin),((int)col));
+			int pix = ((int)lin)*(hmw);
+			//printf("%d\n",pix );
+			pix += ((int)col);
+			//printf("%d\n",pix );
+			return ((float)imageData[pix]/255)*intensity;
+		}	
+};

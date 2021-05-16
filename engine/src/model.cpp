@@ -158,8 +158,6 @@ public:
 		if (!(nLins)) nLins = sqrt((float)lastVx); 
 		if (!(nCols)) nCols = sqrt((float)lastVx);
 		
-		//printf("%f\n",nLins);
-
 		for(int h = 0; h < (vertexList.size()/3); h++){
 			float pixelH = (float)h/ (float)lastVx;
 
@@ -177,6 +175,16 @@ public:
 		}
 	}
 };
+
+
+
+
+
+
+
+
+
+
 
 
 class Material{
