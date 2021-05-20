@@ -209,7 +209,6 @@ public:
 		this->spec.assign(spec.begin(),spec.end());
 		this->ambt.assign(ambt.begin(),ambt.end());
 		this->emsv.assign(emsv.begin(),emsv.end());
-		texSet = 0;
 		texID = 0;
 		this->invertCull = invertCull;
 	}
@@ -233,27 +232,25 @@ public:
 		ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
 		texData = ilGetData();
 		glGenTextures(1,&texID);
-		texSet = 1;
 		this->invertCull = invertCull;
 
+
+		glBindTexture(GL_TEXTURE_2D,texID);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tw, th, 0, GL_RGBA, GL_UNSIGNED_BYTE, texData);
 	}
 
+	
 	void setup(){
-
 		GLfloat colD[] = {diff[0], diff[1], diff[2], diff[3]};
 		GLfloat colS[] = {spec[0], spec[1], spec[2], spec[3]};
 		GLfloat colA[] = {ambt[0], ambt[1], ambt[2], ambt[3]};
 		GLfloat colE[] = {emsv[0], emsv[1], emsv[2], emsv[3]};
 		
-		if (texSet){
-			glBindTexture(GL_TEXTURE_2D,texID);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tw, th, 0, GL_RGBA, GL_UNSIGNED_BYTE, texData);
-		}
-
+		glBindTexture(GL_TEXTURE_2D,texID);
 
 		if (diff[3]>= 0) glColor3f(diff[0], diff[1], diff[2]);
 		if (ambt[3]>= 0) glMaterialfv(GL_FRONT, GL_AMBIENT, colA);
@@ -266,6 +263,5 @@ public:
 			glCullFace(GL_FRONT);
 			glFrontFace(GL_CCW);
 		}
-		
 	}
 };
