@@ -188,6 +188,8 @@ int main(int argc,  char **argv) {
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 
+
+	scene->lastMeasure = glutGet(GLUT_ELAPSED_TIME);
 	// enter GLUT's main cycle
 	glutMainLoop();
 	

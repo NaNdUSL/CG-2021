@@ -168,7 +168,7 @@ class CatmullTranslate : public Transform{
 
 
 
-		std::vector<float> getPointCurve(float t, int rot=0){
+		std::vector<float> getPointCurve(float t, int toRot=0){
 			int index = floor(t);
 			t = t - index;
 
@@ -207,7 +207,7 @@ class CatmullTranslate : public Transform{
 			res.clear();
 			matDotVec(a,T,&res); // 
 
-			if (rot){
+			if (toRot){
 				matDotVec(a,Tlinha,&deriv);
 			}
 			return res;
@@ -218,7 +218,6 @@ class CatmullTranslate : public Transform{
 			if (toDraw)	{
 				this->draw();
 			}
-
 			currPoint(timeDelta);
 			getRotationMat();
 			glTranslatef(point[0],point[1],point[2]);
