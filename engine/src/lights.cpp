@@ -37,32 +37,36 @@ class LightRef{
 		virtual void place() = 0;
 };
 
+
 int LightRef::total = 0;
 
 
 
-
 class PointLight : public LightRef{
+	
 	public:
 		PointLight(std::vector<float> vals):LightRef(vals, 1.0f){
 		}
-
 		void place(){
 			glLightfv(GL_LIGHT0+id,GL_POSITION, vectsUtil);
 		}
 };
+
+
 
 
 class DirectLight : public LightRef{
+	
 	public:
 		DirectLight(std::vector<float> vals):LightRef(vals, 0.0f){
 		}
-
-
 		void place(){
 			glLightfv(GL_LIGHT0+id,GL_POSITION, vectsUtil);
 		}
 };
+
+
+
 
 
 
@@ -98,5 +102,3 @@ class SpotLight : public LightRef{
 		}
 };
 
-// sei la
-// tudo no parsing agora vai ficar chato pq tem 55 argumentos diferentes por tag isso [e um comentario o filho duma puta, resolveu wtf
