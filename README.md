@@ -4,3 +4,7 @@ Trabalho realizado juntamente com @luislcc, @flake-png e Diogo Monteiro para a U
 A Engine desenvolvida conta ainda com um interpretador de uma linguagem emulada em XML para facilitar o desenvolvimento de Scenes mais complexas. O interpretador conta com comandos básicos descritos em tags no XML como if then else e while loop, execução de aritmética básica e geometria (seno, cosseno, tangente), além de fatores aleatórios.
 
 O gerador conta com abertura de UVs automática consoante o shape escolhido, assim como o cálulo das devidas normais para cada vértice, em um arquivo legível pela própria engine do projeto.
+
+Autores:
+
+Luís Almeida: https://github.com/luislcc João Pedro Antunes: https://github.com/MrXester Fernando Lobo: https://github.com/flake-png
