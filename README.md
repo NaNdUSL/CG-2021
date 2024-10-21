@@ -1,5 +1,5 @@
 # CG-2021
-Trabalho realizado juntamente com @luislcc, @flake-png e @monteiro06 para a Unidade curricular de Computação Gráfica, o Projeto consistia de uma engine em C++ utilizando-se de OpenGl que deveria ler arquivos em XML com as Scenes a serem desenhadas, e um gerador de Shapes 3D também em C++ que contava com shapes simples desde cubos a tórus e com leitura de arquivos de patches, para criação de formas complexas utilizando de curvas de Bezier.
+Trabalho realizado juntamente com @luislcc, @MrXester e @monteiro06 para a Unidade curricular de Computação Gráfica, o Projeto consistia de uma engine em C++ utilizando-se de OpenGl que deveria ler arquivos em XML com as Scenes a serem desenhadas, e um gerador de Shapes 3D também em C++ que contava com shapes simples desde cubos a tórus e com leitura de arquivos de patches, para criação de formas complexas utilizando de curvas de Bezier.
 
 A Engine desenvolvida conta ainda com um interpretador de uma linguagem emulada em XML para facilitar o desenvolvimento de Scenes mais complexas. O interpretador conta com comandos básicos descritos em tags no XML como if then else e while loop, execução de aritmética básica e geometria (seno, cosseno, tangente), além de fatores aleatórios.
 
