@@ -7,4 +7,4 @@ O gerador conta com abertura de UVs automática consoante o shape escolhido, ass
 
 Autores:
 
-Luís Almeida: https://github.com/luislcc João Pedro Antunes: https://github.com/MrXester Fernando Lobo: https://github.com/flake-png Diogo Monteiro: https://github.com/monteiro06 
+Luís Almeida: https://github.com/luislcc João Pedro Antunes: https://github.com/MrXester Fernando Lobo: https://github.com/NaNdUSL Diogo Monteiro: https://github.com/monteiro06 
